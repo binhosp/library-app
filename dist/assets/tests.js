@@ -65,6 +65,11 @@ define('library-app/tests/app.lint-test', [], function () {
     assert.ok(true, 'routes/contact.js should pass ESLint\n\n');
   });
 
+  QUnit.test('routes/libraries/edit.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'routes/libraries/edit.js should pass ESLint\n\n');
+  });
+
   QUnit.test('routes/libraries/index.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'routes/libraries/index.js should pass ESLint\n\n');
@@ -427,6 +432,11 @@ define('library-app/tests/tests.lint-test', [], function () {
     assert.ok(true, 'unit/routes/contact-test.js should pass ESLint\n\n');
   });
 
+  QUnit.test('unit/routes/libraries/edit-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/routes/libraries/edit-test.js should pass ESLint\n\n');
+  });
+
   QUnit.test('unit/routes/libraries/index-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/routes/libraries/index-test.js should pass ESLint\n\n');
@@ -564,6 +574,19 @@ define('library-app/tests/unit/routes/contact-test', ['ember-qunit'], function (
   'use strict';
 
   (0, _emberQunit.moduleFor)('route:contact', 'Unit | Route | contact', {
+    // Specify the other units that are required for this test.
+    // needs: ['controller:foo']
+  });
+
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var route = this.subject();
+    assert.ok(route);
+  });
+});
+define('library-app/tests/unit/routes/libraries/edit-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleFor)('route:libraries/edit', 'Unit | Route | libraries/edit', {
     // Specify the other units that are required for this test.
     // needs: ['controller:foo']
   });

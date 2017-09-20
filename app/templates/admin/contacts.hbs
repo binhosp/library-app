@@ -6,18 +6,27 @@
 
     <<thead>
         <tr>
+            <th>Id</th>
             <th>E-mail</th>
             <th>Message</th>
+            <th>Action</th>
+            
         </tr>
         </thead>
         <tbody>
             {{#each model as |contact|}}
             <tr>
                 <th>
+                    {{contact.id}}
+                </th>
+                <th>
                     {{contact.email}}
                 </th>
                 <td>
                     {{contact.message}}
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-xs" {{ action 'deleteContact' contact }}>Delete</button>
                 </td>
             </tr>
             {{/each}}

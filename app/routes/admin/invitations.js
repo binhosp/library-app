@@ -8,5 +8,17 @@ export default Ember.Route.extend({
         
         //a string do findAll é o nome do model invitation
         return this.store.findAll('invitation');
-    }
+    },
+
+    actions: {
+        deleteInvitation(invitation){
+
+            let confirmation = confirm('Deseja deletar a Invitation?');
+
+            if(confirmation){
+                invitation.destroyRecord();
+            }
+
+        }
+    }   
 });
