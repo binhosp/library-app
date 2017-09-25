@@ -10,6 +10,18 @@ export default Ember.Route.extend({
         return this.store.findRecord('library',params.library_id);
     },
 
+    setupController :  function(controller, model){
+        
+        this._super(controller, model);//herança
+
+        controller.set('title', 'Edit library');
+        controller.set('buttonLabel', 'Save changes');
+    },
+
+    renderTemplate(){
+        this.render('libraries/form');
+    },
+
     actions : {
 
         //ação para salvar um objeto library

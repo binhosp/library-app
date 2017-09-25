@@ -13,6 +13,7 @@ Router.map(function() {
   this.route('admin', function() {
     this.route('invitations');
     this.route('contacts');
+    this.route('seeder');
   });
 
   //criando na mão sem ember-cli
@@ -20,6 +21,8 @@ Router.map(function() {
     this.route('new');
     this.route('edit', { path : '/:library_id/edit' });
   });
+  this.route('authors');
+  this.route('books');
 });
 
 export default Router;
