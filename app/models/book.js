@@ -19,7 +19,7 @@ export default DS.Model.extend({
 
     return this;
   },
-
+   
   _bookTitle() {
     return `${Faker.commerce.productName()} Cookbook`;
   },

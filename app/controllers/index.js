@@ -8,6 +8,7 @@ export default Ember.Controller.extend({
 
     actions: {
         
+        
         saveInvitation(){
             const email = this.get('emailAddress');
 

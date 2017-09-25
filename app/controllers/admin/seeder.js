@@ -10,7 +10,8 @@ export default Ember.Controller.extend({
 
       // Progress flag, data-down to seeder-block where our lovely button will show a spinner...
       this.set('generateLibrariesInProgress', true);
-
+    
+      
       const counter = parseInt(volume);
       let savedLibraries = [];
 

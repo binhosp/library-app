@@ -21,7 +21,7 @@ export default Ember.Route.extend({
 
       if (author.get('isNotValid')) {
         return;
-      }
+      } 
 
       author.set('isEditing', false);
       author.save();

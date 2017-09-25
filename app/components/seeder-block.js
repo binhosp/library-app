@@ -7,6 +7,7 @@ export default Ember.Component.extend({
 
   counter: null,
 
+  
   isCounterValid: Ember.computed.lte('counter', MAX_VALUE),
   isCounterNotValid: Ember.computed.not('isCounterValid'),
   placeholder: `Max ${MAX_VALUE}`,

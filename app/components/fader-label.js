@@ -18,6 +18,7 @@ export default Ember.Component.extend({
     this._runLater = Ember.run.later(() => this.set('isShowing', false), 3000);
   }),
 
+   
   resetRunLater() {
     this.set('isShowing', false);
     Ember.run.cancel(this._runLater);

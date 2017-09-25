@@ -57,7 +57,7 @@ export default Ember.Route.extend({
           previousAuthorBooks.removeObject(book);
           previousAuthor.save();
         });
-      });
+      }); 
 
       // Setup the new relation
       book.set('author', author);

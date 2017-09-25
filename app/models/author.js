@@ -15,5 +15,5 @@ export default DS.Model.extend({
   randomize() {
     this.set('name', Faker.name.findName());
     return this;
-  }
+  } 
 });
