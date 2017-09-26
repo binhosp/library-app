@@ -12,7 +12,11 @@ export default DS.Model.extend({
   library: DS.belongsTo('library', {inverse: 'books', async: true}),
 
   randomize(author, library) {
+    Faker.locale ='pt_BR';
+    Faker.localeFallback ='pt_BR';
+    
     this.set('title', this._bookTitle());
+    console.log(this.get('title'));
     this.set('author', author);
     this.set('releaseYear', this._randomYear());
     this.set('library', library);

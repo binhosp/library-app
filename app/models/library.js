@@ -14,9 +14,12 @@ export default DS.Model.extend({
 
   isValid:  Ember.computed.notEmpty('name'),
 
+  
 
   //abaixo o codigo serve para gerar dados fakes desse modelo
   randomize() {
+    Faker.locale ='pt_BR';
+    Faker.localeFallback ='pt_BR';
     this.set('name', Faker.company.companyName() + ' Library');
     this.set('address', this._fullAddress());
     this.set('phone', Faker.phone.phoneNumber());

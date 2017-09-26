@@ -13,9 +13,10 @@ export default DS.Model.extend({
   isNotValid: Ember.computed.empty('name'),
 
   randomize() {
+    Faker.locale ='pt_BR';
+    Faker.localeFallback ='pt_BR';
     this.set('name', Faker.name.findName());
+    console.log(this.get('name'));
     return this;
   } 
-
-  
 });
