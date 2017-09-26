@@ -7,6 +7,8 @@ export default Ember.Component.extend({
   classNames: ['label label-success label-fade'],
   classNameBindings: ['isShowing:label-show'],
 
+  
+
   isShowing: false,
 
   isShowingChanged: Ember.observer('isShowing', function() {
