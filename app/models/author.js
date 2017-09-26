@@ -16,6 +16,4 @@ export default DS.Model.extend({
     this.set('name', Faker.name.findName());
     return this;
   } 
-  
-
 });
