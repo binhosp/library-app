@@ -15,9 +15,54 @@ define('library-app/tests/app.lint-test', [], function () {
     assert.ok(true, 'app.js should pass ESLint\n\n');
   });
 
+  QUnit.test('components/fader-label.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'components/fader-label.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('components/library-item-form.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'components/library-item-form.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('components/library-item.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'components/library-item.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('components/nav-link-to.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'components/nav-link-to.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('components/number-box.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'components/number-box.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('components/seeder-block.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'components/seeder-block.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('controllers/admin/seeder.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'controllers/admin/seeder.js should pass ESLint\n\n');
+  });
+
   QUnit.test('controllers/index.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'controllers/index.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('models/author.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'models/author.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('models/book.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'models/book.js should pass ESLint\n\n');
   });
 
   QUnit.test('models/contact.js', function (assert) {
@@ -58,6 +103,21 @@ define('library-app/tests/app.lint-test', [], function () {
   QUnit.test('routes/admin/invitations.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'routes/admin/invitations.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('routes/admin/seeder.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'routes/admin/seeder.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('routes/authors.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'routes/authors.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('routes/books.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'routes/books.js should pass ESLint\n\n');
   });
 
   QUnit.test('routes/contact.js', function (assert) {
@@ -346,6 +406,180 @@ define('library-app/tests/helpers/unstub-firebase', ['exports', 'firebase'], fun
     }
   }
 });
+define('library-app/tests/integration/components/fader-label-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForComponent)('fader-label', 'Integration | Component | fader label', {
+    integration: true
+  });
+
+  (0, _emberQunit.test)('it renders', function (assert) {
+    // Set any properties with this.set('myProperty', 'value');
+    // Handle any actions with this.on('myAction', function(val) { ... });
+
+    this.render(Ember.HTMLBars.template({
+      "id": "vceb9EwA",
+      "block": "{\"symbols\":[],\"statements\":[[1,[18,\"fader-label\"],false]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), '');
+
+    // Template block usage:
+    this.render(Ember.HTMLBars.template({
+      "id": "/hUg1JnM",
+      "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[4,\"fader-label\",null,null,{\"statements\":[[0,\"      template block text\\n\"]],\"parameters\":[]},null],[0,\"  \"]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
+});
+define('library-app/tests/integration/components/library-item-form-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForComponent)('library-item-form', 'Integration | Component | library item form', {
+    integration: true
+  });
+
+  (0, _emberQunit.test)('it renders', function (assert) {
+    // Set any properties with this.set('myProperty', 'value');
+    // Handle any actions with this.on('myAction', function(val) { ... });
+
+    this.render(Ember.HTMLBars.template({
+      "id": "5o6zne1N",
+      "block": "{\"symbols\":[],\"statements\":[[1,[18,\"library-item-form\"],false]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), '');
+
+    // Template block usage:
+    this.render(Ember.HTMLBars.template({
+      "id": "zpO7PQfX",
+      "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[4,\"library-item-form\",null,null,{\"statements\":[[0,\"      template block text\\n\"]],\"parameters\":[]},null],[0,\"  \"]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
+});
+define('library-app/tests/integration/components/library-item-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForComponent)('library-item', 'Integration | Component | library item', {
+    integration: true
+  });
+
+  (0, _emberQunit.test)('it renders', function (assert) {
+    // Set any properties with this.set('myProperty', 'value');
+    // Handle any actions with this.on('myAction', function(val) { ... });
+
+    this.render(Ember.HTMLBars.template({
+      "id": "yo/UKTcC",
+      "block": "{\"symbols\":[],\"statements\":[[1,[18,\"library-item\"],false]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), '');
+
+    // Template block usage:
+    this.render(Ember.HTMLBars.template({
+      "id": "SkOdkOXI",
+      "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[4,\"library-item\",null,null,{\"statements\":[[0,\"      template block text\\n\"]],\"parameters\":[]},null],[0,\"  \"]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
+});
+define('library-app/tests/integration/components/nav-link-to-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForComponent)('nav-link-to', 'Integration | Component | nav link to', {
+    integration: true
+  });
+
+  (0, _emberQunit.test)('it renders', function (assert) {
+    // Set any properties with this.set('myProperty', 'value');
+    // Handle any actions with this.on('myAction', function(val) { ... });
+
+    this.render(Ember.HTMLBars.template({
+      "id": "Vi9gd8RX",
+      "block": "{\"symbols\":[],\"statements\":[[1,[18,\"nav-link-to\"],false]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), '');
+
+    // Template block usage:
+    this.render(Ember.HTMLBars.template({
+      "id": "fu6y5FW9",
+      "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[4,\"nav-link-to\",null,null,{\"statements\":[[0,\"      template block text\\n\"]],\"parameters\":[]},null],[0,\"  \"]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
+});
+define('library-app/tests/integration/components/number-box-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForComponent)('number-box', 'Integration | Component | number box', {
+    integration: true
+  });
+
+  (0, _emberQunit.test)('it renders', function (assert) {
+    // Set any properties with this.set('myProperty', 'value');
+    // Handle any actions with this.on('myAction', function(val) { ... });
+
+    this.render(Ember.HTMLBars.template({
+      "id": "zSJ00Xqj",
+      "block": "{\"symbols\":[],\"statements\":[[1,[18,\"number-box\"],false]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), '');
+
+    // Template block usage:
+    this.render(Ember.HTMLBars.template({
+      "id": "f6iTZ6j7",
+      "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[4,\"number-box\",null,null,{\"statements\":[[0,\"      template block text\\n\"]],\"parameters\":[]},null],[0,\"  \"]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
+});
+define('library-app/tests/integration/components/seeder-block-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForComponent)('seeder-block', 'Integration | Component | seeder block', {
+    integration: true
+  });
+
+  (0, _emberQunit.test)('it renders', function (assert) {
+    // Set any properties with this.set('myProperty', 'value');
+    // Handle any actions with this.on('myAction', function(val) { ... });
+
+    this.render(Ember.HTMLBars.template({
+      "id": "9xPjyZ6k",
+      "block": "{\"symbols\":[],\"statements\":[[1,[18,\"seeder-block\"],false]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), '');
+
+    // Template block usage:
+    this.render(Ember.HTMLBars.template({
+      "id": "u1aZsge9",
+      "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[4,\"seeder-block\",null,null,{\"statements\":[[0,\"      template block text\\n\"]],\"parameters\":[]},null],[0,\"  \"]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
+});
 define('library-app/tests/test-helper', ['library-app/tests/helpers/resolver', 'ember-qunit', 'ember-cli-qunit'], function (_resolver, _emberQunit, _emberCliQunit) {
   'use strict';
 
@@ -377,9 +611,44 @@ define('library-app/tests/tests.lint-test', [], function () {
     assert.ok(true, 'helpers/start-app.js should pass ESLint\n\n');
   });
 
+  QUnit.test('integration/components/fader-label-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'integration/components/fader-label-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('integration/components/library-item-form-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'integration/components/library-item-form-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('integration/components/library-item-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'integration/components/library-item-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('integration/components/nav-link-to-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'integration/components/nav-link-to-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('integration/components/number-box-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'integration/components/number-box-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('integration/components/seeder-block-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'integration/components/seeder-block-test.js should pass ESLint\n\n');
+  });
+
   QUnit.test('test-helper.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'test-helper.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('unit/controllers/admin/seeder-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/controllers/admin/seeder-test.js should pass ESLint\n\n');
   });
 
   QUnit.test('unit/controllers/contact-test.js', function (assert) {
@@ -390,6 +659,16 @@ define('library-app/tests/tests.lint-test', [], function () {
   QUnit.test('unit/controllers/index-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/controllers/index-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('unit/models/author-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/models/author-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('unit/models/book-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/models/book-test.js should pass ESLint\n\n');
   });
 
   QUnit.test('unit/models/contact-test.js', function (assert) {
@@ -427,6 +706,21 @@ define('library-app/tests/tests.lint-test', [], function () {
     assert.ok(true, 'unit/routes/admin/invitations-test.js should pass ESLint\n\n');
   });
 
+  QUnit.test('unit/routes/admin/seeder-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/routes/admin/seeder-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('unit/routes/authors-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/routes/authors-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('unit/routes/books-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/routes/books-test.js should pass ESLint\n\n');
+  });
+
   QUnit.test('unit/routes/contact-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/routes/contact-test.js should pass ESLint\n\n');
@@ -445,6 +739,20 @@ define('library-app/tests/tests.lint-test', [], function () {
   QUnit.test('unit/routes/libraries/new-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/routes/libraries/new-test.js should pass ESLint\n\n');
+  });
+});
+define('library-app/tests/unit/controllers/admin/seeder-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleFor)('controller:admin/seeder', 'Unit | Controller | admin/seeder', {
+    // Specify the other units that are required for this test.
+    // needs: ['controller:foo']
+  });
+
+  // Replace this with your real tests.
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var controller = this.subject();
+    assert.ok(controller);
   });
 });
 define('library-app/tests/unit/controllers/contact-test', ['ember-qunit'], function (_emberQunit) {
@@ -473,6 +781,34 @@ define('library-app/tests/unit/controllers/index-test', ['ember-qunit'], functio
   (0, _emberQunit.test)('it exists', function (assert) {
     var controller = this.subject();
     assert.ok(controller);
+  });
+});
+define('library-app/tests/unit/models/author-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForModel)('author', 'Unit | Model | author', {
+    // Specify the other units that are required for this test.
+    needs: ['model:book']
+  });
+
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var model = this.subject();
+    // let store = this.store();
+    assert.ok(!!model);
+  });
+});
+define('library-app/tests/unit/models/book-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForModel)('book', 'Unit | Model | book', {
+    // Specify the other units that are required for this test.
+    needs: ['model:library']
+  });
+
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var model = this.subject();
+    // let store = this.store();
+    assert.ok(!!model);
   });
 });
 define('library-app/tests/unit/models/contact-test', ['ember-qunit'], function (_emberQunit) {
@@ -561,6 +897,45 @@ define('library-app/tests/unit/routes/admin/invitations-test', ['ember-qunit'], 
   'use strict';
 
   (0, _emberQunit.moduleFor)('route:admin/invitations', 'Unit | Route | admin/invitations', {
+    // Specify the other units that are required for this test.
+    // needs: ['controller:foo']
+  });
+
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var route = this.subject();
+    assert.ok(route);
+  });
+});
+define('library-app/tests/unit/routes/admin/seeder-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleFor)('route:admin/seeder', 'Unit | Route | admin/seeder', {
+    // Specify the other units that are required for this test.
+    // needs: ['controller:foo']
+  });
+
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var route = this.subject();
+    assert.ok(route);
+  });
+});
+define('library-app/tests/unit/routes/authors-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleFor)('route:authors', 'Unit | Route | authors', {
+    // Specify the other units that are required for this test.
+    // needs: ['controller:foo']
+  });
+
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var route = this.subject();
+    assert.ok(route);
+  });
+});
+define('library-app/tests/unit/routes/books-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleFor)('route:books', 'Unit | Route | books', {
     // Specify the other units that are required for this test.
     // needs: ['controller:foo']
   });
