@@ -16,7 +16,8 @@ Router.map(function() {
     this.route('seeder');
   });
 
-  //criando na mão sem ember-cli
+  //Exemplo de rotas aninhadas
+  //criando na mão sem ember-cli 
   this.route('libraries',function(){
     this.route('new');
     this.route('edit', { path : '/:library_id/edit' });

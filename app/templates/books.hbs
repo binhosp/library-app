@@ -1,28 +1,27 @@
-<h1>Books</h1>
+<h1>Livros</h1>
 
 <table class="table table-bordered table-striped">
   <thead>
   <tr>
     <th class="vtop wider">
-      Author
-      <br><small class="small not-bold">(Click on the name for editing)</small>
+      Autor
+      <br><small class="small not-bold">(Clique para editar)</small>
     </th>
     <th>
-      Title
-      <br><small class="small not-bold">(Click on the title for editing)</small>
+      Título
+      <br><small class="small not-bold">(Clique para editar)</small>
     </th>
-    <th class="vtop">Release Year</th>
+    <th class="vtop">Ano de Lançamento</th>
     <th class="vtop">
-      Library
-      <br><small class="small not-bold">(Click on the name for editing)</small>    </th>
+      Biblioteca
+      <br><small class="small not-bold">(Clique para editar)</small>    </th>
   </tr>
   </thead>
   <tbody>
-  {{#each model as |book|}}
+  {{#each model as | book |}}
     <tr>
-
       <td>
-        {{#if book.isAuthorEditing}}
+        {{#if book.isAuthorEditEnabled }}
 
           {{author-select
             book=book
@@ -38,13 +37,13 @@
       </td>
 
       <td>
-        {{#if book.isEditing}}
+        {{#if book.isBookEditEnabled}}
           <form {{action 'saveBook' book on='submit'}} class="form-inline">
             <div class="input-group">
               {{input value=book.title class='form-control'}}
               <div class="input-group-btn">
-                <button type="submit" class="btn btn-success" disabled={{book.isNotValid}}>Save</button>
-                <button class="btn btn-danger" {{action 'cancelBookEdit' book}}>Cancel</button>
+                <button type="submit" class="btn btn-success btn-xs" disabled={{book.isNotValid}}>Save</button>
+                <button class="btn btn-danger btn-xs" {{action 'cancelBookEdit' book}}>Cancel</button>
               </div>
             </div>
           </form>

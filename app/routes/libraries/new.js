@@ -10,8 +10,8 @@ export default Ember.Route.extend({
         
         this._super(controller, model);//herança
 
-        controller.set('title', 'Create a new library');
-        controller.set('buttonLabel', 'Create');
+        controller.set('title', 'Nova Biblioteca');
+        controller.set('buttonLabel', 'Novo');
     },
 
     renderTemplate(){
@@ -19,9 +19,11 @@ export default Ember.Route.extend({
     },
 
     actions: {
-
+        
         saveLibrary(newLibrary) {
+           
             newLibrary.save().then(() => this.transitionTo('libraries'));
+            
         },       
 
         //Isso é um evento

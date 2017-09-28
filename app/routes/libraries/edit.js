@@ -14,8 +14,8 @@ export default Ember.Route.extend({
         
         this._super(controller, model);//herança
 
-        controller.set('title', 'Edit library');
-        controller.set('buttonLabel', 'Save changes');
+        controller.set('title', 'Editar biblioteca');
+        controller.set('buttonLabel', 'Salvar');
     },
 
     renderTemplate(){

@@ -5814,9 +5814,6 @@ button.close {
   .hidden-print {
     display: none !important; } }
 
-body {
-  padding-top: 20px; }
-
 html {
   overflow-y: scroll; }
 

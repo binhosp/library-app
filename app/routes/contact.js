@@ -6,21 +6,20 @@ export default Ember.Route.extend({
     model() {
         return this.store.createRecord('contact');
     },
+    
     actions: {
 
         sendEmail(newContactMessage) {
 
-           
-            //newContactMessage.save().then(() => this.controller.set('responseMessage', true));
-            newContactMessage.save().then(() => this.controller.set('responseSendEmail', true));
+           newContactMessage.save().then(() => this.controller.set('responseSendEmail', true));
 
             /*
             var email = this.get('email');
             var message = this.get('message');
 
-            alert('Sending your message in progress... ');
+            alert('Enviando sua mensagem... ');
 
-            var responseMessage = 'To: ' + email + ', Message: ' + message;
+            var responseMessage = 'Para: ' + email + ', Mensagem: ' + message;
             this.set('responseSendEmail', responseMessage);
             this.set('email', '');
             this.set('message', '');
@@ -28,6 +27,7 @@ export default Ember.Route.extend({
         },
 
         willTransition() {
+            
             let model = this.controller.get('model');
 
             if (model.get('isNew')) {

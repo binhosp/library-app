@@ -28,6 +28,31 @@ define('library-app/app', ['exports', 'library-app/resolver', 'ember-load-initia
 
   exports.default = App;
 });
+define('library-app/components/author-select', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Component.extend({
+
+        tagName: 'select',
+        classNames: ['form-control'],
+        authors: [],
+        book: null,
+
+        change: function change(event) {
+
+            var selectedAuthorId = event.target.value;
+
+            var selectedAuthor = this.get('authors').find(function (record) {
+                return record.id === selectedAuthorId;
+            });
+
+            this.sendAction('action', selectedAuthor, this.get('book'));
+        }
+    });
+});
 define('library-app/components/fader-label', ['exports'], function (exports) {
   'use strict';
 
@@ -76,28 +101,56 @@ define('library-app/components/library-item-form', ['exports'], function (export
 
     actions: {
       buttonClicked: function buttonClicked(param) {
+
         this.sendAction('action', param);
       }
     }
+
   });
 });
 define('library-app/components/library-item', ['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.default = Ember.Component.extend({});
-});
-define('library-app/components/nav-link-to', ['exports'], function (exports) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    exports.default = Ember.LinkComponent.extend({
-        tagName: 'li'
+    exports.default = Ember.Component.extend({});
+});
+define('library-app/components/library-select', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
     });
+    exports.default = Ember.Component.extend({
+
+        tagName: 'select',
+        classNames: ['form-control'],
+        libraries: [],
+        book: null,
+
+        change: function change(event) {
+
+            var selectedLibraryId = event.target.value;
+
+            var selectedLibrary = this.get('libraries').find(function (record) {
+                return record.id === selectedLibraryId;
+            });
+
+            this.sendAction('action', selectedLibrary, this.get('book'));
+        }
+    });
+});
+define('library-app/components/nav-link-to', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.LinkComponent.extend({
+
+    tagName: 'li'
+  });
 });
 define('library-app/components/number-box', ['exports'], function (exports) {
   'use strict';
@@ -173,19 +226,21 @@ define('library-app/controllers/admin/seeder', ['exports', 'faker'], function (e
       generateLibraries: function generateLibraries(volume) {
         var _this = this;
 
-        // Progress flag, data-down to seeder-block where our lovely button will show a spinner...
+        //console.log('qntde de libraries para gerar : ' + volume);
+
+        // true para mostar a icone spinner.
         this.set('generateLibrariesInProgress', true);
 
         var counter = parseInt(volume);
-        var savedLibraries = [];
 
+        var savedLibraries = [];
         for (var i = 0; i < counter; i++) {
 
-          // Collect all Promise in an array
+          // cria e adiciona no array um library gerado
           savedLibraries.push(this._saveRandomLibrary());
         }
 
-        // Wait for all Promise to fulfill so we can show our label and turn off the spinner.
+        // Espera o promisse terminar para desligar o spinner e mostrar o fader-label.
         Ember.RSVP.all(savedLibraries).then(function () {
           _this.set('generateLibrariesInProgress', false);
           _this.set('libDone', true);
@@ -194,14 +249,14 @@ define('library-app/controllers/admin/seeder', ['exports', 'faker'], function (e
       deleteLibraries: function deleteLibraries() {
         var _this2 = this;
 
-        // Progress flag, data-down to seeder-block button spinner.
+        // true para mostar a icone spinner qndo deletar
         this.set('deleteLibrariesInProgress', true);
 
-        // Our local _destroyAll return a promise, we change the label when all records destroyed.
+        // O _destroyAll retorna uma promisse e mudamos o label quandos todas as linha forem removidas.
         this._destroyAll(this.get('libraries'))
 
-        // Data down via seeder-block to fader-label that we ready to show the label.
-        // Change the progress indicator also, so the spinner can be turned off.
+        // A remoção feita através do seeder-block para o fader-label para poder mostar no label.
+        // Mudar o indicador de progresso e deslicar o spinner.
         .then(function () {
           _this2.set('libDelDone', true);
           _this2.set('deleteLibrariesInProgress', false);
@@ -210,7 +265,7 @@ define('library-app/controllers/admin/seeder', ['exports', 'faker'], function (e
       generateBooksAndAuthors: function generateBooksAndAuthors(volume) {
         var _this3 = this;
 
-        // Progress flag, data-down to seeder-block button spinner.
+        // true para mostar a icone spinner.
         this.set('generateBooksInProgress', true);
 
         var counter = parseInt(volume);
@@ -218,18 +273,18 @@ define('library-app/controllers/admin/seeder', ['exports', 'faker'], function (e
 
         for (var i = 0; i < counter; i++) {
 
-          // Collect Promises in an array.
+          // cria e adiciona no array um book gerado.
           var books = this._saveRandomAuthor().then(function (newAuthor) {
             return _this3._generateSomeBooks(newAuthor);
           });
           booksWithAuthors.push(books);
         }
 
-        // Let's wait until all async save resolved, show a label and turn off the spinner.
+        // Espera que o save assincrono termine para assim deligar o spinner e mostrar o fader-label.
         Ember.RSVP.all(booksWithAuthors)
 
-        // Data down via seeder-block to fader-label that we ready to show the label
-        // Change the progress flag also, so the spinner can be turned off.
+        // A remoção feita através do seeder-block para o fader-label para poder mostar no label.
+        // Mudar o indicador de progresso e deslicar o spinner.
         .then(function () {
           _this3.set('authDone', true);
           _this3.set('generateBooksInProgress', false);
@@ -238,19 +293,19 @@ define('library-app/controllers/admin/seeder', ['exports', 'faker'], function (e
       deleteBooksAndAuthors: function deleteBooksAndAuthors() {
         var _this4 = this;
 
-        // Progress flag, data-down to seeder-block button to show spinner.
+        // true para mostar a icone spinner.
         this.set('deleteBooksInProgress', true);
 
         var authors = this.get('authors');
         var books = this.get('books');
 
-        // Remove authors first and books later, finally show the label.
+        // Remove primeira os autores e os livros depois, e no final mostra o label.
         this._destroyAll(authors).then(function () {
           return _this4._destroyAll(books);
         })
 
-        // Data down via seeder-block to fader-label that we ready to show the label
-        // Delete is finished, we can turn off the spinner in seeder-block button.
+        // A remoção feita através do seeder-block para o fader-label para poder mostar no label.
+        // Mudar o indicador de progresso e deslicar o spinner.
         .then(function () {
           _this4.set('authDelDone', true);
           _this4.set('deleteBooksInProgress', false);
@@ -258,10 +313,9 @@ define('library-app/controllers/admin/seeder', ['exports', 'faker'], function (e
       }
     },
 
-    // Private methods
-
-    // Create a new library record and uses the randomizator, which is in our model and generates some fake data in
-    // the new record. After we save it, which is a promise, so this returns a promise.
+    //Metodos privados
+    // Cria uma record de library record usando o randomizador do faker que ira colocar dados fake no model
+    // Depois disso salva e retorna uma promisse
     _saveRandomLibrary: function _saveRandomLibrary() {
       return this.store.createRecord('library').randomize().save();
     },
@@ -277,12 +331,12 @@ define('library-app/controllers/admin/seeder', ['exports', 'faker'], function (e
       var _loop = function _loop(j) {
         var library = _this5._selectRandomLibrary();
 
-        // Creating and saving book, saving the related records also are take while, they are all a Promise.
+        // Cria e salva um book, salvando as record relacionadas. isso leva um tempo pois todos são promisses.
         var bookPromise = _this5.store.createRecord('book').randomize(author, library).save().then(function () {
           return author.save();
         })
 
-        // guard library in case if we don't have any
+        // Guarda um Library caso não tenha nenhuma
         .then(function () {
           return library && library.save();
         });
@@ -293,14 +347,20 @@ define('library-app/controllers/admin/seeder', ['exports', 'faker'], function (e
         _loop(j);
       }
 
-      // Return a Promise, so we can manage the whole process on time
+      // Retorna um a promisse para que possamos gerenciat o tempo de processamento
       return Ember.RSVP.all(books);
     },
     _selectRandomLibrary: function _selectRandomLibrary() {
 
+      // As Libraries são records da store, ou seja, é um DS.RecordArray
+
       // Please note libraries are records from store, which means this is a DS.RecordArray object, it is extended from
       // Ember.ArrayProxy. If you need an element from this list, you cannot just use libraries[3], we have to use
       // libraries.objectAt(3)
+
+      /**
+       * Como as Libraries Ember.ArrayProxy
+       */
       var libraries = this.get('libraries');
       var size = libraries.get('length');
 
@@ -329,9 +389,13 @@ define('library-app/controllers/index', ['exports'], function (exports) {
     });
     exports.default = Ember.Controller.extend({
 
-        headerMessage: 'Coming Soon',
+        headerMessage: 'Em breve',
         responseMessage: '',
         emailAddress: '',
+
+        //serao usado para validar a tela de convite index.hbs
+        isValid: Ember.computed.match('emailAddress', /^.+@.+\..+$/),
+        isDisabled: Ember.computed.not('isValid'),
 
         actions: {
             saveInvitation: function saveInvitation() {
@@ -339,12 +403,20 @@ define('library-app/controllers/index', ['exports'], function (exports) {
 
                 var email = this.get('emailAddress');
 
+                /**
+                 * Criando um objeto invitation no controler ao executar o saveInvitation()
+                 */
                 var newInvitation = this.store.createRecord('invitation', {
                     email: email
                 });
 
+                /**
+                 * Caso o response esteja ok ao salvar...
+                 */
                 newInvitation.save().then(function (response) {
-                    _this.set('responseMessage', 'Thank you ! We\'ve just saved your email address: ' + _this.get('emailAddress') + ' with id: ' + response.get('id'));
+                    //defino um mensagem em responseMessage e 
+                    _this.set('responseMessage', 'Obrigado! Salvamos seu endere\xE7o de e-mail: ' + _this.get('emailAddress') + ' com id : ' + response.get('id'));
+                    //limpo o campo de e-mail vinculado no index.hbs 
                     _this.set('emailAddress', '');
                 });
             }
@@ -374,6 +446,20 @@ define('library-app/helpers/app-version', ['exports', 'library-app/config/enviro
   }
 
   exports.default = Ember.Helper.helper(appVersion);
+});
+define('library-app/helpers/is-equal', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.isEqual = isEqual;
+  function isEqual(params /*, hash*/) {
+
+    return params[0] === params[1];
+  }
+
+  exports.default = Ember.Helper.helper(isEqual);
 });
 define('library-app/helpers/pluralize', ['exports', 'ember-inflector/lib/helpers/pluralize'], function (exports, _pluralize) {
   'use strict';
@@ -580,7 +666,10 @@ define('library-app/models/author', ['exports', 'ember-data', 'faker'], function
     isNotValid: Ember.computed.empty('name'),
 
     randomize: function randomize() {
+      _faker.default.locale = 'pt_BR';
+      _faker.default.localeFallback = 'pt_BR';
       this.set('name', _faker.default.name.findName());
+      //console.log(this.get('name'));
       return this;
     }
   });
@@ -600,7 +689,11 @@ define('library-app/models/book', ['exports', 'ember-data', 'faker'], function (
     library: _emberData.default.belongsTo('library', { inverse: 'books', async: true }),
 
     randomize: function randomize(author, library) {
+      _faker.default.locale = 'pt_BR';
+      _faker.default.localeFallback = 'pt_BR';
+
       this.set('title', this._bookTitle());
+      //console.log(this.get('title'));
       this.set('author', author);
       this.set('releaseYear', this._randomYear());
       this.set('library', library);
@@ -625,6 +718,10 @@ define('library-app/models/contact', ['exports', 'ember-data'], function (export
     value: true
   });
   exports.default = _emberData.default.Model.extend({
+
+    /**
+     *Atributos do modelo 
+     */
     email: _emberData.default.attr('string'),
     message: _emberData.default.attr('string'),
 
@@ -666,6 +763,8 @@ define('library-app/models/library', ['exports', 'ember-data', 'faker'], functio
 
     //abaixo o codigo serve para gerar dados fakes desse modelo
     randomize: function randomize() {
+      _faker.default.locale = 'pt_BR';
+      _faker.default.localeFallback = 'pt_BR';
       this.set('name', _faker.default.company.companyName() + ' Library');
       this.set('address', this._fullAddress());
       this.set('phone', _faker.default.phone.phoneNumber());
@@ -709,7 +808,8 @@ define('library-app/router', ['exports', 'library-app/config/environment'], func
       this.route('seeder');
     });
 
-    //criando na mão sem ember-cli
+    //Exemplo de rotas aninhadas
+    //criando na mão sem ember-cli 
     this.route('libraries', function () {
       this.route('new');
       this.route('edit', { path: '/:library_id/edit' });
@@ -853,20 +953,28 @@ define('library-app/routes/authors', ['exports'], function (exports) {
 
 
     actions: {
+
+      //true para ativar o modo edição
       editAuthor: function editAuthor(author) {
-        author.set('isEditing', true);
+        author.set('editEnable', true);
       },
+
+
+      //false para canceler e desfazer as alterações que o model author sofreu
       cancelAuthorEdit: function cancelAuthorEdit(author) {
-        author.set('isEditing', false);
+        author.set('editEnable', false);
         author.rollbackAttributes();
       },
+
+
+      //salvando a alterção
       saveAuthor: function saveAuthor(author) {
 
         if (author.get('isNotValid')) {
           return;
         }
 
-        author.set('isEditing', false);
+        author.set('editEnable', false);
         author.save();
       }
     }
@@ -880,49 +988,49 @@ define('library-app/routes/books', ['exports'], function (exports) {
   });
   exports.default = Ember.Route.extend({
     model: function model() {
+
+      //Ember.RSVP serve para fazer uma chamda de varios modelos, ao mesmo tempo, em uma única rota.
       return Ember.RSVP.hash({
+        //RSVP.hash empacota múltiplas promisses e retorna um objeto de hash bem estruturado. 
         books: this.store.findAll('book'),
         authors: this.store.findAll('author'),
         libraries: this.store.findAll('library')
       });
     },
     setupController: function setupController(controller, model) {
+
       var books = model.books;
+
       var authors = model.authors;
+
       var libraries = model.libraries;
 
       this._super(controller, books);
 
       controller.set('authors', authors);
+
       controller.set('libraries', libraries);
     },
 
 
     actions: {
-      editBook: function editBook(book) {
-        book.set('isEditing', true);
-      },
-      cancelBookEdit: function cancelBookEdit(book) {
-        book.set('isEditing', false);
-        book.rollbackAttributes();
-      },
-      saveBook: function saveBook(book) {
-        if (book.get('isNotValid')) {
-          return;
-        }
 
-        book.set('isEditing', false);
-        book.save();
-      },
+      /**
+       *Ações para o objeto book na coluna Autor do template/books.hbs  
+      */
+      //true para flegar q o autor esta em modo edição
       editAuthor: function editAuthor(book) {
-        book.set('isAuthorEditing', true);
+        book.set('isAuthorEditEnabled', true);
       },
+
+      //false para cancelar o modo edição e desfazer as alterações no model de autor
       cancelAuthorEdit: function cancelAuthorEdit(book) {
-        book.set('isAuthorEditing', false);
+        book.set('isAuthorEditEnabled', false);
         book.rollbackAttributes();
       },
       saveAuthor: function saveAuthor(author, book) {
-        // Firebase adapter is buggy, we have to manually remove the previous relation
+
+        // Removendo a relação do autor com livro
         book.get('author').then(function (previousAuthor) {
           previousAuthor.get('books').then(function (previousAuthorBooks) {
             previousAuthorBooks.removeObject(book);
@@ -930,24 +1038,54 @@ define('library-app/routes/books', ['exports'], function (exports) {
           });
         });
 
-        // Setup the new relation
+        // Associação do novo autor no livro
         book.set('author', author);
         book.save().then(function () {
           return author.save();
         });
         book.set('isAuthorEditing', false);
       },
+
+
+      /**
+       *Ações para o objeto book na coluna titulo do template/books.hbs 
+       */
+      //true para flegar q o livro esta em modo edição
+      editBook: function editBook(book) {
+        book.set('isBookEditEnabled', true);
+      },
+
+      //false para cancelar o modo edição e desfazer as alterações no model livro
+      cancelBookEdit: function cancelBookEdit(book) {
+        book.set('isBookEditEnabled', false);
+        book.rollbackAttributes();
+      },
+      saveBook: function saveBook(book) {
+        if (book.get('isNotValid')) {
+          return;
+        }
+
+        book.set('isBookEditEnabled', false);
+        book.save();
+      },
+
+
+      /**
+       * Ações para o objeto book na coluna biblioteca do template/books.hbs  
+      */
+      //true para flegar q o autor esta em modo edição
       editLibrary: function editLibrary(book) {
         book.set('isLibraryEditing', true);
       },
+
+
+      //false para cancelar o modo edição e desfazer as alterações no model biblioteca
       cancelLibraryEdit: function cancelLibraryEdit(book) {
         book.set('isLibraryEditing', false);
         book.rollbackAttributes();
       },
       saveLibrary: function saveLibrary(library, book) {
-        // Firebase adapter is buggy, we have to manually remove the previous relation.
-        // You don't need this callback mess when your adapter properly manages relations.
-        // If Firebase fix this bug, we can remove this part.
+        // Removendo a relação do biblioteca com livro
         book.get('library').then(function (previousLibrary) {
           previousLibrary.get('books').then(function (previousLibraryBooks) {
             previousLibraryBooks.removeObject(book);
@@ -975,11 +1113,11 @@ define('library-app/routes/contact', ['exports'], function (exports) {
             return this.store.createRecord('contact');
         },
 
+
         actions: {
             sendEmail: function sendEmail(newContactMessage) {
                 var _this = this;
 
-                //newContactMessage.save().then(() => this.controller.set('responseMessage', true));
                 newContactMessage.save().then(function () {
                     return _this.controller.set('responseSendEmail', true);
                 });
@@ -987,14 +1125,15 @@ define('library-app/routes/contact', ['exports'], function (exports) {
                 /*
                 var email = this.get('email');
                 var message = this.get('message');
-                  alert('Sending your message in progress... ');
-                  var responseMessage = 'To: ' + email + ', Message: ' + message;
+                  alert('Enviando sua mensagem... ');
+                  var responseMessage = 'Para: ' + email + ', Mensagem: ' + message;
                 this.set('responseSendEmail', responseMessage);
                 this.set('email', '');
                 this.set('message', '');
                 */
             },
             willTransition: function willTransition() {
+
                 var model = this.controller.get('model');
 
                 if (model.get('isNew')) {
@@ -1028,8 +1167,8 @@ define('library-app/routes/libraries/edit', ['exports'], function (exports) {
 
             this._super(controller, model); //herança
 
-            controller.set('title', 'Edit library');
-            controller.set('buttonLabel', 'Save changes');
+            controller.set('title', 'Editar biblioteca');
+            controller.set('buttonLabel', 'Salvar');
         },
 
         renderTemplate: function renderTemplate() {
@@ -1114,8 +1253,8 @@ define('library-app/routes/libraries/new', ['exports'], function (exports) {
 
             this._super(controller, model); //herança
 
-            controller.set('title', 'Create a new library');
-            controller.set('buttonLabel', 'Create');
+            controller.set('title', 'Nova Biblioteca');
+            controller.set('buttonLabel', 'Novo');
         },
 
         renderTemplate: function renderTemplate() {
@@ -1182,7 +1321,7 @@ define("library-app/templates/about", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "2D95zSsf", "block": "{\"symbols\":[],\"statements\":[[6,\"h1\"],[7],[0,\"About Page\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/about.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "gdnVNs1q", "block": "{\"symbols\":[],\"statements\":[[6,\"h1\"],[7],[0,\" Em desenvolvimento ... \"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/about.hbs" } });
 });
 define("library-app/templates/admin/contacts", ["exports"], function (exports) {
   "use strict";
@@ -1190,7 +1329,7 @@ define("library-app/templates/admin/contacts", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "lYL1Mwh9", "block": "{\"symbols\":[\"contact\"],\"statements\":[[2,\" app/templates/admin/invitation.hbs \"],[0,\"\\n\\n\"],[6,\"h1\"],[7],[0,\"Contacts\"],[8],[0,\"\\n\\n\"],[6,\"table\"],[9,\"class\",\"table table-bordered table-striped\"],[7],[0,\"\\n\\n    \"],[6,\"thead\"],[7],[0,\"\\n        \"],[6,\"tr\"],[7],[0,\"\\n            \"],[6,\"th\"],[7],[0,\"Id\"],[8],[0,\"\\n            \"],[6,\"th\"],[7],[0,\"E-mail\"],[8],[0,\"\\n            \"],[6,\"th\"],[7],[0,\"Message\"],[8],[0,\"\\n            \"],[6,\"th\"],[7],[0,\"Action\"],[8],[0,\"\\n            \\n        \"],[8],[0,\"\\n        \"],[8],[0,\"\\n        \"],[6,\"tbody\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"model\"]]],null,{\"statements\":[[0,\"            \"],[6,\"tr\"],[7],[0,\"\\n                \"],[6,\"th\"],[7],[0,\"\\n                    \"],[1,[19,1,[\"id\"]],false],[0,\"\\n                \"],[8],[0,\"\\n                \"],[6,\"th\"],[7],[0,\"\\n                    \"],[1,[19,1,[\"email\"]],false],[0,\"\\n                \"],[8],[0,\"\\n                \"],[6,\"td\"],[7],[0,\"\\n                    \"],[1,[19,1,[\"message\"]],false],[0,\"\\n                \"],[8],[0,\"\\n                \"],[6,\"td\"],[7],[0,\"\\n                    \"],[6,\"button\"],[9,\"class\",\"btn btn-danger btn-xs\"],[3,\"action\",[[19,0,[]],\"deleteContact\",[19,1,[]]]],[7],[0,\"Delete\"],[8],[0,\"\\n                \"],[8],[0,\"\\n            \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"        \"],[8],[0,\"\\n\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/admin/contacts.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "lpCB0jlL", "block": "{\"symbols\":[\"contact\"],\"statements\":[[2,\" app/templates/admin/invitation.hbs \"],[0,\"\\n\\n\"],[6,\"h1\"],[7],[0,\"Lista de Contatos\"],[8],[0,\"\\n\\n\"],[6,\"table\"],[9,\"class\",\"table table-bordered table-striped\"],[7],[0,\"\\n\\n    \"],[6,\"thead\"],[7],[0,\"\\n        \"],[6,\"tr\"],[7],[0,\"\\n            \"],[6,\"th\"],[7],[0,\"Id\"],[8],[0,\"\\n            \"],[6,\"th\"],[7],[0,\"E-mail\"],[8],[0,\"\\n            \"],[6,\"th\"],[7],[0,\"Mensagem\"],[8],[0,\"\\n            \"],[6,\"th\"],[7],[0,\"Ação\"],[8],[0,\"\\n            \\n        \"],[8],[0,\"\\n        \"],[8],[0,\"\\n        \"],[6,\"tbody\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"model\"]]],null,{\"statements\":[[0,\"            \"],[6,\"tr\"],[7],[0,\"\\n                \"],[6,\"th\"],[7],[0,\"\\n                    \"],[1,[19,1,[\"id\"]],false],[0,\"\\n                \"],[8],[0,\"\\n                \"],[6,\"th\"],[7],[0,\"\\n                    \"],[1,[19,1,[\"email\"]],false],[0,\"\\n                \"],[8],[0,\"\\n                \"],[6,\"td\"],[7],[0,\"\\n                    \"],[1,[19,1,[\"message\"]],false],[0,\"\\n                \"],[8],[0,\"\\n                \"],[6,\"td\"],[7],[0,\"\\n                    \"],[6,\"button\"],[9,\"class\",\"btn btn-danger btn-xs\"],[3,\"action\",[[19,0,[]],\"deleteContact\",[19,1,[]]]],[7],[0,\"Delete\"],[8],[0,\"\\n                \"],[8],[0,\"\\n            \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"        \"],[8],[0,\"\\n\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/admin/contacts.hbs" } });
 });
 define("library-app/templates/admin/invitations", ["exports"], function (exports) {
   "use strict";
@@ -1198,7 +1337,7 @@ define("library-app/templates/admin/invitations", ["exports"], function (exports
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "1zNTUjQW", "block": "{\"symbols\":[\"invitation\"],\"statements\":[[2,\" app/templates/admin/invitation.hbs \"],[0,\"\\n\\n\"],[6,\"h1\"],[7],[0,\"invitations\"],[8],[0,\"\\n\\n\"],[6,\"table\"],[9,\"class\",\"table table-bordered table-striped\"],[7],[0,\"\\n\\n    \"],[6,\"thead\"],[7],[0,\"\\n        \"],[6,\"tr\"],[7],[0,\"\\n            \"],[6,\"th\"],[7],[0,\"ID\"],[8],[0,\"\\n            \"],[6,\"th\"],[7],[0,\"E-mail\"],[8],[0,\"\\n            \"],[6,\"th\"],[7],[0,\"Action\"],[8],[0,\"\\n\\n        \"],[8],[0,\"\\n        \"],[8],[0,\"\\n        \"],[6,\"tbody\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"model\"]]],null,{\"statements\":[[0,\"            \"],[6,\"tr\"],[7],[0,\"\\n                \"],[6,\"th\"],[7],[0,\"\\n                    \"],[1,[19,1,[\"id\"]],false],[0,\"\\n                \"],[8],[0,\"\\n                \"],[6,\"td\"],[7],[0,\"\\n                    \"],[1,[19,1,[\"email\"]],false],[0,\"\\n                \"],[8],[0,\"\\n                \"],[6,\"td\"],[7],[0,\"\\n                    \"],[6,\"button\"],[9,\"class\",\"btn btn-danger btn-xs\"],[3,\"action\",[[19,0,[]],\"deleteInvitation\",[19,1,[]]]],[7],[0,\" Delete\"],[8],[0,\"\\n                \"],[8],[0,\"\\n            \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"        \"],[8],[0,\"\\n\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/admin/invitations.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "rD0C3YXC", "block": "{\"symbols\":[\"invitation\"],\"statements\":[[2,\" app/templates/admin/invitation.hbs \"],[0,\"\\n\\n\"],[6,\"h1\"],[7],[0,\"Lista de Convites\"],[8],[0,\"\\n\\n\"],[6,\"table\"],[9,\"class\",\"table table-bordered table-striped\"],[7],[0,\"\\n\\n    \"],[6,\"thead\"],[7],[0,\"\\n        \"],[6,\"tr\"],[7],[0,\"\\n            \"],[6,\"th\"],[7],[0,\"Id\"],[8],[0,\"\\n            \"],[6,\"th\"],[7],[0,\"E-mail\"],[8],[0,\"\\n            \"],[6,\"th\"],[7],[0,\"Ação\"],[8],[0,\"\\n\\n        \"],[8],[0,\"\\n        \"],[8],[0,\"\\n        \"],[6,\"tbody\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"model\"]]],null,{\"statements\":[[0,\"            \"],[6,\"tr\"],[7],[0,\"\\n                \"],[6,\"th\"],[7],[0,\"\\n                    \"],[1,[19,1,[\"id\"]],false],[0,\"\\n                \"],[8],[0,\"\\n                \"],[6,\"td\"],[7],[0,\"\\n                    \"],[1,[19,1,[\"email\"]],false],[0,\"\\n                \"],[8],[0,\"\\n                \"],[6,\"td\"],[7],[0,\"\\n                    \"],[6,\"button\"],[9,\"class\",\"btn btn-danger btn-xs\"],[3,\"action\",[[19,0,[]],\"deleteInvitation\",[19,1,[]]]],[7],[0,\" Delete\"],[8],[0,\"\\n                \"],[8],[0,\"\\n            \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"        \"],[8],[0,\"\\n\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/admin/invitations.hbs" } });
 });
 define("library-app/templates/admin/seeder", ["exports"], function (exports) {
   "use strict";
@@ -1206,7 +1345,7 @@ define("library-app/templates/admin/seeder", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "FgCjlPrd", "block": "{\"symbols\":[],\"statements\":[[2,\" app/templates/admin/seeder.hbs \"],[0,\"\\n\"],[6,\"h1\"],[7],[0,\"Seeder, our Data Center\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"row\"],[7],[0,\"\\n \"],[6,\"div\"],[9,\"class\",\"col-md-4\"],[7],[1,[25,\"number-box\",null,[[\"title\",\"number\"],[\"Libraries\",[19,0,[\"libraries\",\"length\"]]]]],false],[8],[0,\"\\n \"],[6,\"div\"],[9,\"class\",\"col-md-4\"],[7],[1,[25,\"number-box\",null,[[\"title\",\"number\"],[\"Authors\",[19,0,[\"authors\",\"length\"]]]]],false],[8],[0,\"\\n \"],[6,\"div\"],[9,\"class\",\"col-md-4\"],[7],[1,[25,\"number-box\",null,[[\"title\",\"number\"],[\"Books\",[19,0,[\"books\",\"length\"]]]]],false],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[1,[25,\"seeder-block\",null,[[\"sectionTitle\",\"generateAction\",\"deleteAction\",\"generateReady\",\"deleteReady\",\"generateInProgress\",\"deleteInProgress\"],[\"Libraries\",\"generateLibraries\",\"deleteLibraries\",[19,0,[\"libDone\"]],[19,0,[\"libDelDone\"]],[19,0,[\"generateLibrariesInProgress\"]],[19,0,[\"deleteLibrariesInProgress\"]]]]],false],[0,\"\\n\\n\"],[1,[25,\"seeder-block\",null,[[\"sectionTitle\",\"generateAction\",\"deleteAction\",\"generateReady\",\"deleteReady\",\"generateInProgress\",\"deleteInProgress\"],[\"Authors with Books\",\"generateBooksAndAuthors\",\"deleteBooksAndAuthors\",[19,0,[\"authDone\"]],[19,0,[\"authDelDone\"]],[19,0,[\"generateBooksInProgress\"]],[19,0,[\"deleteBooksInProgress\"]]]]],false]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/admin/seeder.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "JQ0PzGTU", "block": "{\"symbols\":[],\"statements\":[[2,\" app/templates/admin/seeder.hbs \"],[0,\"\\n\"],[6,\"h1\"],[7],[0,\"Gerador de dados mock com Ember-Faker\"],[8],[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"row\"],[7],[0,\"\\n \"],[6,\"div\"],[9,\"class\",\"col-md-4\"],[7],[0,\"\\n     \"],[1,[25,\"number-box\",null,[[\"title\",\"number\"],[\"Bibliotecas\",[19,0,[\"libraries\",\"length\"]]]]],false],[0,\"\\n \"],[8],[0,\"\\n \"],[6,\"div\"],[9,\"class\",\"col-md-4\"],[7],[0,\"\\n     \"],[1,[25,\"number-box\",null,[[\"title\",\"number\"],[\"Autores\",[19,0,[\"authors\",\"length\"]]]]],false],[0,\"\\n \"],[8],[0,\"\\n \"],[6,\"div\"],[9,\"class\",\"col-md-4\"],[7],[0,\"\\n     \"],[1,[25,\"number-box\",null,[[\"title\",\"number\"],[\"Livros\",[19,0,[\"books\",\"length\"]]]]],false],[0,\"\\n \"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[1,[25,\"seeder-block\",null,[[\"sectionTitle\",\"generateAction\",\"deleteAction\",\"generateReady\",\"deleteReady\",\"generateInProgress\",\"deleteInProgress\"],[\"Bibliotecas\",\"generateLibraries\",\"deleteLibraries\",[19,0,[\"libDone\"]],[19,0,[\"libDelDone\"]],[19,0,[\"generateLibrariesInProgress\"]],[19,0,[\"deleteLibrariesInProgress\"]]]]],false],[0,\"\\n\\n\"],[1,[25,\"seeder-block\",null,[[\"sectionTitle\",\"generateAction\",\"deleteAction\",\"generateReady\",\"deleteReady\",\"generateInProgress\",\"deleteInProgress\"],[\"Autores com Livros\",\"generateBooksAndAuthors\",\"deleteBooksAndAuthors\",[19,0,[\"authDone\"]],[19,0,[\"authDelDone\"]],[19,0,[\"generateBooksInProgress\"]],[19,0,[\"deleteBooksInProgress\"]]]]],false]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/admin/seeder.hbs" } });
 });
 define("library-app/templates/application", ["exports"], function (exports) {
   "use strict";
@@ -1214,7 +1353,7 @@ define("library-app/templates/application", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "uj4p/m5d", "block": "{\"symbols\":[],\"statements\":[[6,\"div\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[12,\"navbar\",[]],[0,\"\\n    \"],[1,[18,\"outlet\"],false],[0,\"\\n\"],[8]],\"hasEval\":true}", "meta": { "moduleName": "library-app/templates/application.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "ZZh9p56Z", "block": "{\"symbols\":[],\"statements\":[[2,\"\\n<div class=\\\"container\\\">\\n    {{partial \\\"navbar\\\"}}\\n    {{outlet}}\\n</div>\\n\"],[0,\"\\n\\n\"],[12,\"navbar\",[]],[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[1,[18,\"outlet\"],false],[0,\"\\n\"],[8],[0,\"\\n\\n\\n\\n\\n\"]],\"hasEval\":true}", "meta": { "moduleName": "library-app/templates/application.hbs" } });
 });
 define("library-app/templates/authors", ["exports"], function (exports) {
   "use strict";
@@ -1222,7 +1361,7 @@ define("library-app/templates/authors", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "haVNeawd", "block": "{\"symbols\":[\"author\",\"book\"],\"statements\":[[6,\"h1\"],[7],[0,\"Authors\"],[8],[0,\"\\n\\n \"],[6,\"table\"],[9,\"class\",\"table table-bordered table-striped\"],[7],[0,\"\\n   \"],[6,\"thead\"],[7],[0,\"\\n     \"],[6,\"tr\"],[7],[0,\"\\n       \"],[6,\"th\"],[7],[0,\"Name\"],[8],[0,\"\\n       \"],[6,\"th\"],[7],[0,\"Books\"],[8],[0,\"\\n     \"],[8],[0,\"\\n   \"],[8],[0,\"\\n   \"],[6,\"tbody\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"model\"]]],null,{\"statements\":[[0,\"       \"],[6,\"tr\"],[7],[0,\"\\n         \"],[6,\"td\"],[7],[1,[19,1,[\"name\"]],false],[8],[0,\"\\n         \"],[6,\"td\"],[7],[0,\"\\n           \"],[6,\"ul\"],[7],[0,\"\\n\"],[4,\"each\",[[19,1,[\"books\"]]],null,{\"statements\":[[0,\"               \"],[6,\"li\"],[7],[1,[19,2,[\"title\"]],false],[8],[0,\"\\n\"]],\"parameters\":[2]},null],[0,\"           \"],[8],[0,\"\\n         \"],[8],[0,\"\\n       \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"   \"],[8],[0,\"\\n \"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/authors.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "ZHQYC1yu", "block": "{\"symbols\":[\"author\",\"book\"],\"statements\":[[6,\"h1\"],[7],[0,\"Autores\"],[8],[0,\"\\n\\n\"],[6,\"table\"],[9,\"class\",\"table table-bordered table-striped\"],[7],[0,\"\\n  \"],[6,\"thead\"],[7],[0,\"\\n    \"],[6,\"tr\"],[7],[0,\"\\n      \"],[6,\"th\"],[7],[0,\"Nome\\n        \"],[6,\"br\"],[7],[8],[6,\"small\"],[9,\"class\",\"small not-bold\"],[7],[0,\"(Clique no nome para editar)\"],[8],[0,\"\\n      \"],[8],[0,\"\\n      \"],[6,\"th\"],[9,\"class\",\"vtop\"],[7],[0,\"Livros\"],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"tbody\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"model\"]]],null,{\"statements\":[[0,\"    \"],[6,\"tr\"],[7],[0,\"\\n      \"],[6,\"td\"],[7],[0,\"\\n\"],[4,\"if\",[[19,1,[\"editEnable\"]]],null,{\"statements\":[[0,\"        \"],[6,\"form\"],[9,\"class\",\"form-inline\"],[3,\"action\",[[19,0,[]],\"saveAuthor\",[19,1,[]]],[[\"on\"],[\"submit\"]]],[7],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"input-group\"],[7],[0,\"\\n            \"],[2,\" definindo o campo de input e botôes\"],[0,\"\\n            \"],[1,[25,\"input\",null,[[\"value\",\"class\"],[[19,1,[\"name\"]],\"form-comtrol\"]]],false],[0,\"\\n            \"],[6,\"div\"],[9,\"class\",\"input-group-btn\"],[7],[0,\"\\n              \"],[6,\"button\"],[9,\"class\",\"btn btn-success btn-xs\"],[9,\"type\",\"submit\"],[10,\"disabled\",[19,1,[\"isNotValid\"]],null],[7],[0,\" Salvar \"],[8],[0,\"\\n              \"],[6,\"button\"],[9,\"class\",\"btn btn-danger btn-xs\"],[3,\"action\",[[19,0,[]],\"cancelAuthorEdit\",[19,1,[]]]],[7],[0,\" Cancelar \"],[8],[0,\"\\n            \"],[8],[0,\"\\n          \"],[8],[0,\"\\n        \"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"          \"],[6,\"span\"],[3,\"action\",[[19,0,[]],\"editAuthor\",[19,1,[]]]],[7],[0,\" \"],[1,[19,1,[\"name\"]],false],[0,\" \"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"      \"],[8],[0,\"\\n      \"],[6,\"td\"],[7],[0,\"\\n        \"],[6,\"ul\"],[7],[0,\"\\n\"],[4,\"each\",[[19,1,[\"books\"]]],null,{\"statements\":[[0,\"          \"],[6,\"li\"],[7],[1,[19,2,[\"title\"]],false],[8],[0,\"\\n\"]],\"parameters\":[2]},null],[0,\"        \"],[8],[0,\"\\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/authors.hbs" } });
 });
 define("library-app/templates/books", ["exports"], function (exports) {
   "use strict";
@@ -1230,7 +1369,15 @@ define("library-app/templates/books", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "F35H7cSm", "block": "{\"symbols\":[\"book\"],\"statements\":[[6,\"h1\"],[7],[0,\"Books\"],[8],[0,\"\\n\\n\"],[6,\"table\"],[9,\"class\",\"table table-bordered table-striped\"],[7],[0,\"\\n  \"],[6,\"thead\"],[7],[0,\"\\n  \"],[6,\"tr\"],[7],[0,\"\\n    \"],[6,\"th\"],[9,\"class\",\"vtop wider\"],[7],[0,\"\\n      Author\\n      \"],[6,\"br\"],[7],[8],[6,\"small\"],[9,\"class\",\"small not-bold\"],[7],[0,\"(Click on the name for editing)\"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"th\"],[7],[0,\"\\n      Title\\n      \"],[6,\"br\"],[7],[8],[6,\"small\"],[9,\"class\",\"small not-bold\"],[7],[0,\"(Click on the title for editing)\"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"th\"],[9,\"class\",\"vtop\"],[7],[0,\"Release Year\"],[8],[0,\"\\n    \"],[6,\"th\"],[9,\"class\",\"vtop\"],[7],[0,\"\\n      Library\\n      \"],[6,\"br\"],[7],[8],[6,\"small\"],[9,\"class\",\"small not-bold\"],[7],[0,\"(Click on the name for editing)\"],[8],[0,\"    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"tbody\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"model\"]]],null,{\"statements\":[[0,\"    \"],[6,\"tr\"],[7],[0,\"\\n\\n      \"],[6,\"td\"],[7],[0,\"\\n\"],[4,\"if\",[[19,1,[\"isAuthorEditing\"]]],null,{\"statements\":[[0,\"\\n          \"],[1,[25,\"author-select\",null,[[\"book\",\"authors\",\"default\",\"action\"],[[19,1,[]],[19,0,[\"authors\"]],[19,1,[\"author\"]],\"saveAuthor\"]]],false],[0,\"\\n\\n          \"],[6,\"button\"],[9,\"class\",\"btn btn-danger\"],[3,\"action\",[[19,0,[]],\"cancelAuthorEdit\",[19,1,[]]]],[7],[0,\"Cancel\"],[8],[0,\"\\n\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"          \"],[6,\"span\"],[3,\"action\",[[19,0,[]],\"editAuthor\",[19,1,[]]]],[7],[1,[19,1,[\"author\",\"name\"]],false],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"      \"],[8],[0,\"\\n\\n      \"],[6,\"td\"],[7],[0,\"\\n\"],[4,\"if\",[[19,1,[\"isEditing\"]]],null,{\"statements\":[[0,\"          \"],[6,\"form\"],[9,\"class\",\"form-inline\"],[3,\"action\",[[19,0,[]],\"saveBook\",[19,1,[]]],[[\"on\"],[\"submit\"]]],[7],[0,\"\\n            \"],[6,\"div\"],[9,\"class\",\"input-group\"],[7],[0,\"\\n              \"],[1,[25,\"input\",null,[[\"value\",\"class\"],[[19,1,[\"title\"]],\"form-control\"]]],false],[0,\"\\n              \"],[6,\"div\"],[9,\"class\",\"input-group-btn\"],[7],[0,\"\\n                \"],[6,\"button\"],[9,\"type\",\"submit\"],[9,\"class\",\"btn btn-success\"],[10,\"disabled\",[19,1,[\"isNotValid\"]],null],[7],[0,\"Save\"],[8],[0,\"\\n                \"],[6,\"button\"],[9,\"class\",\"btn btn-danger\"],[3,\"action\",[[19,0,[]],\"cancelBookEdit\",[19,1,[]]]],[7],[0,\"Cancel\"],[8],[0,\"\\n              \"],[8],[0,\"\\n            \"],[8],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"          \"],[6,\"span\"],[3,\"action\",[[19,0,[]],\"editBook\",[19,1,[]]]],[7],[1,[19,1,[\"title\"]],false],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"      \"],[8],[0,\"\\n\\n      \"],[6,\"td\"],[7],[1,[19,1,[\"releaseYear\"]],false],[8],[0,\"\\n      \"],[6,\"td\"],[7],[0,\"\\n\\n\"],[4,\"if\",[[19,1,[\"isLibraryEditing\"]]],null,{\"statements\":[[0,\"\\n          \"],[1,[25,\"library-select\",null,[[\"book\",\"libraries\",\"default\",\"action\"],[[19,1,[]],[19,0,[\"libraries\"]],[19,1,[\"library\"]],\"saveLibrary\"]]],false],[0,\"\\n\\n          \"],[6,\"button\"],[9,\"class\",\"btn btn-danger\"],[3,\"action\",[[19,0,[]],\"cancelLibraryEdit\",[19,1,[]]]],[7],[0,\"Cancel\"],[8],[0,\"\\n\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"          \"],[6,\"span\"],[3,\"action\",[[19,0,[]],\"editLibrary\",[19,1,[]]]],[7],[1,[19,1,[\"library\",\"name\"]],false],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/books.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "LHMmNiW6", "block": "{\"symbols\":[\"book\"],\"statements\":[[6,\"h1\"],[7],[0,\"Livros\"],[8],[0,\"\\n\\n\"],[6,\"table\"],[9,\"class\",\"table table-bordered table-striped\"],[7],[0,\"\\n  \"],[6,\"thead\"],[7],[0,\"\\n  \"],[6,\"tr\"],[7],[0,\"\\n    \"],[6,\"th\"],[9,\"class\",\"vtop wider\"],[7],[0,\"\\n      Autor\\n      \"],[6,\"br\"],[7],[8],[6,\"small\"],[9,\"class\",\"small not-bold\"],[7],[0,\"(Clique para editar)\"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"th\"],[7],[0,\"\\n      Título\\n      \"],[6,\"br\"],[7],[8],[6,\"small\"],[9,\"class\",\"small not-bold\"],[7],[0,\"(Clique para editar)\"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"th\"],[9,\"class\",\"vtop\"],[7],[0,\"Ano de Lançamento\"],[8],[0,\"\\n    \"],[6,\"th\"],[9,\"class\",\"vtop\"],[7],[0,\"\\n      Biblioteca\\n      \"],[6,\"br\"],[7],[8],[6,\"small\"],[9,\"class\",\"small not-bold\"],[7],[0,\"(Clique para editar)\"],[8],[0,\"    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"tbody\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"model\"]]],null,{\"statements\":[[0,\"    \"],[6,\"tr\"],[7],[0,\"\\n      \"],[6,\"td\"],[7],[0,\"\\n\"],[4,\"if\",[[19,1,[\"isAuthorEditEnabled\"]]],null,{\"statements\":[[0,\"\\n          \"],[1,[25,\"author-select\",null,[[\"book\",\"authors\",\"default\",\"action\"],[[19,1,[]],[19,0,[\"authors\"]],[19,1,[\"author\"]],\"saveAuthor\"]]],false],[0,\"\\n\\n          \"],[6,\"button\"],[9,\"class\",\"btn btn-danger\"],[3,\"action\",[[19,0,[]],\"cancelAuthorEdit\",[19,1,[]]]],[7],[0,\"Cancel\"],[8],[0,\"\\n\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"          \"],[6,\"span\"],[3,\"action\",[[19,0,[]],\"editAuthor\",[19,1,[]]]],[7],[1,[19,1,[\"author\",\"name\"]],false],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"      \"],[8],[0,\"\\n\\n      \"],[6,\"td\"],[7],[0,\"\\n\"],[4,\"if\",[[19,1,[\"isBookEditEnabled\"]]],null,{\"statements\":[[0,\"          \"],[6,\"form\"],[9,\"class\",\"form-inline\"],[3,\"action\",[[19,0,[]],\"saveBook\",[19,1,[]]],[[\"on\"],[\"submit\"]]],[7],[0,\"\\n            \"],[6,\"div\"],[9,\"class\",\"input-group\"],[7],[0,\"\\n              \"],[1,[25,\"input\",null,[[\"value\",\"class\"],[[19,1,[\"title\"]],\"form-control\"]]],false],[0,\"\\n              \"],[6,\"div\"],[9,\"class\",\"input-group-btn\"],[7],[0,\"\\n                \"],[6,\"button\"],[9,\"type\",\"submit\"],[9,\"class\",\"btn btn-success btn-xs\"],[10,\"disabled\",[19,1,[\"isNotValid\"]],null],[7],[0,\"Save\"],[8],[0,\"\\n                \"],[6,\"button\"],[9,\"class\",\"btn btn-danger btn-xs\"],[3,\"action\",[[19,0,[]],\"cancelBookEdit\",[19,1,[]]]],[7],[0,\"Cancel\"],[8],[0,\"\\n              \"],[8],[0,\"\\n            \"],[8],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"          \"],[6,\"span\"],[3,\"action\",[[19,0,[]],\"editBook\",[19,1,[]]]],[7],[1,[19,1,[\"title\"]],false],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"      \"],[8],[0,\"\\n\\n      \"],[6,\"td\"],[7],[1,[19,1,[\"releaseYear\"]],false],[8],[0,\"\\n      \"],[6,\"td\"],[7],[0,\"\\n\\n\"],[4,\"if\",[[19,1,[\"isLibraryEditing\"]]],null,{\"statements\":[[0,\"\\n          \"],[1,[25,\"library-select\",null,[[\"book\",\"libraries\",\"default\",\"action\"],[[19,1,[]],[19,0,[\"libraries\"]],[19,1,[\"library\"]],\"saveLibrary\"]]],false],[0,\"\\n \\n          \"],[6,\"button\"],[9,\"class\",\"btn btn-danger\"],[3,\"action\",[[19,0,[]],\"cancelLibraryEdit\",[19,1,[]]]],[7],[0,\"Cancel\"],[8],[0,\"\\n\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"          \"],[6,\"span\"],[3,\"action\",[[19,0,[]],\"editLibrary\",[19,1,[]]]],[7],[1,[19,1,[\"library\",\"name\"]],false],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/books.hbs" } });
+});
+define("library-app/templates/components/author-select", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "MRwlyccW", "block": "{\"symbols\":[\"author\"],\"statements\":[[4,\"each\",[[19,0,[\"authors\"]]],null,{\"statements\":[[0,\"\\n  \"],[6,\"option\"],[10,\"value\",[19,1,[\"id\"]],null],[10,\"selected\",[25,\"is-equal\",[[19,1,[\"id\"]],[19,0,[\"default\",\"id\"]]],null],null],[7],[0,\"\\n    \"],[1,[19,1,[\"name\"]],false],[0,\"\\n  \"],[8],[0,\"\\n\\n\"]],\"parameters\":[1]},null]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/components/author-select.hbs" } });
 });
 define("library-app/templates/components/fader-label", ["exports"], function (exports) {
   "use strict";
@@ -1238,7 +1385,7 @@ define("library-app/templates/components/fader-label", ["exports"], function (ex
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "klBl68u4", "block": "{\"symbols\":[\"&default\"],\"statements\":[[2,\" app/templates/components/fader-label.hbs \"],[0,\"\\n\"],[11,1]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/components/fader-label.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "QvzLatYC", "block": "{\"symbols\":[\"&default\"],\"statements\":[[2,\" app/templates/components/fader-label.hbs \"],[0,\"\\n\"],[11,1],[0,\" \"]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/components/fader-label.hbs" } });
 });
 define("library-app/templates/components/library-item-form", ["exports"], function (exports) {
   "use strict";
@@ -1246,7 +1393,7 @@ define("library-app/templates/components/library-item-form", ["exports"], functi
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "ccTf+COy", "block": "{\"symbols\":[],\"statements\":[[2,\" app/templates/components/library-item-form.hbs \"],[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"form-horizontal\"],[7],[0,\"\\n  \"],[6,\"div\"],[10,\"class\",[26,[\"form-group has-feedback \",[25,\"if\",[[19,0,[\"item\",\"isValid\"]],\"has-success\"],null]]]],[7],[0,\"\\n    \"],[6,\"label\"],[9,\"class\",\"col-sm-2 control-label\"],[7],[0,\"Name\"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"col-sm-10\"],[7],[0,\"\\n      \"],[1,[25,\"input\",null,[[\"type\",\"value\",\"class\",\"placeholder\"],[\"text\",[19,0,[\"item\",\"name\"]],\"form-control\",\"The name of the Library\"]]],false],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"class\",\"form-group\"],[7],[0,\"\\n    \"],[6,\"label\"],[9,\"class\",\"col-sm-2 control-label\"],[7],[0,\"Address\"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"col-sm-10\"],[7],[0,\"\\n      \"],[1,[25,\"input\",null,[[\"type\",\"value\",\"class\",\"placeholder\"],[\"text\",[19,0,[\"item\",\"address\"]],\"form-control\",\"The address of the Library\"]]],false],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"class\",\"form-group\"],[7],[0,\"\\n    \"],[6,\"label\"],[9,\"class\",\"col-sm-2 control-label\"],[7],[0,\"Phone\"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"col-sm-10\"],[7],[0,\"\\n      \"],[1,[25,\"input\",null,[[\"type\",\"value\",\"class\",\"placeholder\"],[\"text\",[19,0,[\"item\",\"phone\"]],\"form-control\",\"The phone number of the Library\"]]],false],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"class\",\"form-group\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"col-sm-offset-2 col-sm-10\"],[7],[0,\"\\n      \"],[6,\"button\"],[9,\"type\",\"submit\"],[9,\"class\",\"btn btn-default\"],[10,\"disabled\",[25,\"unless\",[[19,0,[\"item\",\"isValid\"]],true],null],null],[3,\"action\",[[19,0,[]],\"buttonClicked\",[19,0,[\"item\"]]]],[7],[1,[18,\"buttonLabel\"],false],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/components/library-item-form.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "qO0Tke25", "block": "{\"symbols\":[],\"statements\":[[2,\" app/templates/components/library-item-form.hbs \"],[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"form-horizontal\"],[7],[0,\"\\n  \"],[6,\"div\"],[10,\"class\",[26,[\"form-group has-feedback \",[25,\"if\",[[19,0,[\"item\",\"isValid\"]],\"has-success\"],null]]]],[7],[0,\"\\n    \"],[6,\"label\"],[9,\"class\",\"col-sm-2 control-label\"],[7],[0,\"Nome\"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"col-sm-10\"],[7],[0,\"\\n      \"],[1,[25,\"input\",null,[[\"type\",\"value\",\"class\",\"placeholder\"],[\"text\",[19,0,[\"item\",\"name\"]],\"form-control\",\"Nome da biblioteca\"]]],false],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"class\",\"form-group\"],[7],[0,\"\\n    \"],[6,\"label\"],[9,\"class\",\"col-sm-2 control-label\"],[7],[0,\"Endereço\"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"col-sm-10\"],[7],[0,\"\\n      \"],[1,[25,\"input\",null,[[\"type\",\"value\",\"class\",\"placeholder\"],[\"text\",[19,0,[\"item\",\"address\"]],\"form-control\",\"Endereço da biblioteca\"]]],false],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"class\",\"form-group\"],[7],[0,\"\\n    \"],[6,\"label\"],[9,\"class\",\"col-sm-2 control-label\"],[7],[0,\"Telefone\"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"col-sm-10\"],[7],[0,\"\\n      \"],[1,[25,\"input\",null,[[\"type\",\"value\",\"class\",\"placeholder\"],[\"text\",[19,0,[\"item\",\"phone\"]],\"form-control\",\"Telefone da biblioteca\"]]],false],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"class\",\"form-group\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"col-sm-offset-2 col-sm-10\"],[7],[0,\"\\n      \"],[6,\"button\"],[9,\"type\",\"submit\"],[9,\"class\",\"btn btn-success\"],[10,\"disabled\",[25,\"unless\",[[19,0,[\"item\",\"isValid\"]],true],null],null],[3,\"action\",[[19,0,[]],\"buttonClicked\",[19,0,[\"item\"]]]],[7],[1,[18,\"buttonLabel\"],false],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n\"],[8],[0,\" \"]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/components/library-item-form.hbs" } });
 });
 define("library-app/templates/components/library-item", ["exports"], function (exports) {
   "use strict";
@@ -1254,7 +1401,15 @@ define("library-app/templates/components/library-item", ["exports"], function (e
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "D++qOQnF", "block": "{\"symbols\":[\"&default\"],\"statements\":[[6,\"div\"],[9,\"class\",\"panel panel-default library-item\"],[7],[0,\"\\n\\n    \"],[6,\"div\"],[9,\"class\",\"panel-heading\"],[7],[0,\"\\n        \"],[6,\"h3\"],[9,\"class\",\"panel-title\"],[7],[1,[20,[\"item\",\"name\"]],false],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"panel-body\"],[7],[0,\"\\n        \"],[6,\"p\"],[7],[0,\"Address: \"],[1,[20,[\"item\",\"address\"]],false],[8],[0,\"\\n        \"],[6,\"p\"],[7],[0,\"Phone: \"],[1,[20,[\"item\",\"phone\"]],false],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"panel-footer text-right\"],[7],[0,\"\\n        \"],[11,1],[0,\"\\n    \"],[8],[0,\"\\n\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/components/library-item.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "z7kvyrZI", "block": "{\"symbols\":[\"&default\"],\"statements\":[[6,\"div\"],[9,\"class\",\"panel panel-default library-item\"],[7],[0,\"\\n\\n    \"],[6,\"div\"],[9,\"class\",\"panel-heading\"],[7],[0,\"\\n        \"],[6,\"h3\"],[9,\"class\",\"panel-title\"],[7],[0,\"Titulo: \"],[1,[20,[\"item\",\"name\"]],false],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"panel-body\"],[7],[0,\"\\n        \"],[6,\"p\"],[7],[0,\"Endereço: \"],[1,[20,[\"item\",\"address\"]],false],[8],[0,\"\\n        \"],[6,\"p\"],[7],[0,\"Telefone: \"],[1,[20,[\"item\",\"phone\"]],false],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"panel-footer text-right\"],[7],[0,\"\\n        \"],[2,\" O campo {{yield}} significa que podemos usar esse componente como um componente de bloco. \\n        O código que este componente envolve será injetado dentro do {{yield}}\\n        Por exemplo:\\n{{#library-item item=model}}\\n        <br/>\\n        {{/library-item}}        \"],[0,\"\\n        \"],[11,1],[0,\"\\n    \"],[8],[0,\"\\n\\n\"],[8],[0,\" \"]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/components/library-item.hbs" } });
+});
+define("library-app/templates/components/library-select", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "46mQ5F3b", "block": "{\"symbols\":[\"library\"],\"statements\":[[4,\"each\",[[19,0,[\"libraries\"]]],null,{\"statements\":[[0,\"    \"],[6,\"option\"],[10,\"value\",[19,1,[\"id\"]],null],[10,\"selected\",[25,\"is-equal\",[[19,1,[\"id\"]],[19,0,[\"default\",\"id\"]]],null],null],[7],[0,\"\\n        \"],[1,[19,1,[\"name\"]],false],[0,\"\\n    \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/components/library-select.hbs" } });
 });
 define("library-app/templates/components/nav-link-to", ["exports"], function (exports) {
   "use strict";
@@ -1262,7 +1417,7 @@ define("library-app/templates/components/nav-link-to", ["exports"], function (ex
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "ZJmM75rg", "block": "{\"symbols\":[\"&default\"],\"statements\":[[2,\" app/templates/components/nav-link-to.hbs \"],[0,\"\\n\"],[6,\"a\"],[9,\"href\",\"\"],[7],[11,1],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/components/nav-link-to.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "c0wqxBOa", "block": "{\"symbols\":[\"&default\"],\"statements\":[[2,\" app/templates/components/nav-link-to.hbs \"],[0,\"\\n\"],[6,\"a\"],[9,\"href\",\"\"],[7],[11,1],[8],[0,\" \"]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/components/nav-link-to.hbs" } });
 });
 define("library-app/templates/components/number-box", ["exports"], function (exports) {
   "use strict";
@@ -1270,7 +1425,7 @@ define("library-app/templates/components/number-box", ["exports"], function (exp
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "sHr+2zBq", "block": "{\"symbols\":[],\"statements\":[[6,\"div\"],[9,\"class\",\"panel-heading\"],[7],[0,\"\\n\\n    \"],[6,\"h3\"],[9,\"class\",\"text-center\"],[7],[1,[18,\"title\"],false],[8],[0,\"\\n    \"],[2,\" se for passado um numero escreve um numero, caso contrario tres pontinhos \"],[0,\"\\n    \"],[6,\"h1\"],[9,\"class\",\"text-center\"],[7],[1,[25,\"if\",[[19,0,[\"number\"]],[19,0,[\"number\"]],\"...\"],null],false],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/components/number-box.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "C5HAbXLl", "block": "{\"symbols\":[],\"statements\":[[6,\"div\"],[9,\"class\",\"panel-heading\"],[7],[0,\"\\n\\n    \"],[6,\"h3\"],[9,\"class\",\"text-center\"],[7],[1,[18,\"title\"],false],[8],[0,\"\\n    \"],[2,\" se for passado um numero escreve um numero, caso contrario tres pontinhos \"],[0,\"\\n    \"],[6,\"h1\"],[9,\"class\",\"text-center\"],[7],[1,[25,\"if\",[[19,0,[\"number\"]],[19,0,[\"number\"]],\"...\"],null],false],[8],[0,\"\\n\"],[8],[0,\"\\n\\n \"]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/components/number-box.hbs" } });
 });
 define("library-app/templates/components/seeder-block", ["exports"], function (exports) {
   "use strict";
@@ -1278,7 +1433,7 @@ define("library-app/templates/components/seeder-block", ["exports"], function (e
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "b7ZouAQv", "block": "{\"symbols\":[],\"statements\":[[2,\" app/templates/components/seeder-block.hbs \"],[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"well well-sm extra-padding-bottom\"],[7],[0,\"\\n  \"],[6,\"h3\"],[7],[1,[18,\"sectionTitle\"],false],[8],[0,\"\\n  \\n  \"],[6,\"div\"],[9,\"class\",\"form-inline\"],[7],[0,\"\\n  \\n   \"],[6,\"div\"],[10,\"class\",[26,[\"form-group has-feedback \",[25,\"unless\",[[19,0,[\"isCounterValid\"]],\"has-error\"],null]]]],[7],[0,\"\\n     \"],[6,\"label\"],[9,\"class\",\"control-label\"],[7],[0,\"Number of new records:\"],[8],[0,\"\\n     \"],[1,[25,\"input\",null,[[\"value\",\"class\",\"placeholder\"],[[19,0,[\"counter\"]],\"form-control\",[19,0,[\"placeholder\"]]]]],false],[0,\"\\n   \"],[8],[0,\"\\n  \\n   \"],[6,\"button\"],[9,\"class\",\"btn btn-primary\"],[10,\"disabled\",[18,\"generateIsDisabled\"],null],[3,\"action\",[[19,0,[]],\"generateAction\"]],[7],[0,\"\\n\"],[4,\"if\",[[19,0,[\"generateInProgress\"]]],null,{\"statements\":[[0,\"       \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-refresh spinning\"],[7],[8],[0,\" Generating...\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"       Generate \"],[1,[18,\"sectionTitle\"],false],[0,\"\\n\"]],\"parameters\":[]}],[0,\"   \"],[8],[0,\"\\n   \"],[4,\"fader-label\",null,[[\"isShowing\"],[[19,0,[\"generateReady\"]]]],{\"statements\":[[0,\"Created!\"]],\"parameters\":[]},null],[0,\"\\n  \\n   \"],[6,\"button\"],[9,\"class\",\"btn btn-danger\"],[10,\"disabled\",[18,\"deleteIsDisabled\"],null],[3,\"action\",[[19,0,[]],\"deleteAction\"]],[7],[0,\"\\n\"],[4,\"if\",[[19,0,[\"deleteInProgress\"]]],null,{\"statements\":[[0,\"       \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-refresh spinning\"],[7],[8],[0,\" Deleting...\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"       Delete All \"],[1,[18,\"sectionTitle\"],false],[0,\"\\n\"]],\"parameters\":[]}],[0,\"   \"],[8],[0,\"\\n   \"],[4,\"fader-label\",null,[[\"isShowing\"],[[19,0,[\"deleteReady\"]]]],{\"statements\":[[0,\"Deleted!\"]],\"parameters\":[]},null],[0,\"\\n  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/components/seeder-block.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "AOlfyYjs", "block": "{\"symbols\":[],\"statements\":[[2,\" app/templates/components/seeder-block.hbs \"],[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"well well-sm extra-padding-bottom\"],[7],[0,\"\\n  \"],[6,\"h3\"],[7],[1,[18,\"sectionTitle\"],false],[8],[0,\"\\n  \\n  \"],[6,\"div\"],[9,\"class\",\"form-inline\"],[7],[0,\"\\n  \\n   \"],[6,\"div\"],[10,\"class\",[26,[\"form-group has-feedback \",[25,\"unless\",[[19,0,[\"isCounterValid\"]],\"has-error\"],null]]]],[7],[0,\"\\n     \"],[6,\"label\"],[9,\"class\",\"control-label\"],[7],[0,\"Quantidade de registros:\"],[8],[0,\"\\n     \"],[1,[25,\"input\",null,[[\"value\",\"class\",\"placeholder\"],[[19,0,[\"counter\"]],\"form-control\",[19,0,[\"placeholder\"]]]]],false],[0,\"\\n   \"],[8],[0,\"\\n  \\n   \"],[6,\"button\"],[9,\"class\",\"btn btn-primary\"],[10,\"disabled\",[18,\"generateIsDisabled\"],null],[3,\"action\",[[19,0,[]],\"generateAction\"]],[7],[0,\"\\n\"],[4,\"if\",[[19,0,[\"generateInProgress\"]]],null,{\"statements\":[[0,\"       \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-refresh spinning\"],[7],[8],[0,\" Gerando...\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"       Gerar \"],[1,[18,\"sectionTitle\"],false],[0,\"\\n\"]],\"parameters\":[]}],[0,\"   \"],[8],[0,\"\\n   \"],[4,\"fader-label\",null,[[\"isShowing\"],[[19,0,[\"generateReady\"]]]],{\"statements\":[[0,\"Created!\"]],\"parameters\":[]},null],[0,\"\\n  \\n   \"],[6,\"button\"],[9,\"class\",\"btn btn-danger\"],[10,\"disabled\",[18,\"deleteIsDisabled\"],null],[3,\"action\",[[19,0,[]],\"deleteAction\"]],[7],[0,\"\\n\"],[4,\"if\",[[19,0,[\"deleteInProgress\"]]],null,{\"statements\":[[0,\"       \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-refresh spinning\"],[7],[8],[0,\" Removendo...\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"       Remover \"],[1,[18,\"sectionTitle\"],false],[0,\"\\n\"]],\"parameters\":[]}],[0,\"   \"],[8],[0,\"\\n   \"],[4,\"fader-label\",null,[[\"isShowing\"],[[19,0,[\"deleteReady\"]]]],{\"statements\":[[0,\"Deleted!\"]],\"parameters\":[]},null],[0,\"\\n  \"],[8],[0,\"\\n\"],[8],[0,\" \"]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/components/seeder-block.hbs" } });
 });
 define("library-app/templates/contact", ["exports"], function (exports) {
   "use strict";
@@ -1286,7 +1441,7 @@ define("library-app/templates/contact", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "pzv6oKvT", "block": "{\"symbols\":[],\"statements\":[[6,\"h1\"],[7],[0,\"Contact Page\"],[8],[0,\"\\n\\n\"],[6,\"p\"],[9,\"class\",\"well well-sm\"],[7],[0,\"\\n    If you have any question or feedback please leave a message with your email address.\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"row\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"col-md-6\"],[7],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"responseSendEmail\"]]],null,{\"statements\":[[0,\"        \"],[6,\"div\"],[9,\"class\",\"col-md-6\"],[7],[0,\"\\n            \"],[6,\"br\"],[7],[8],[0,\"\\n            \"],[6,\"div\"],[9,\"class\",\"alert alert-success\"],[7],[0,\"\\n                \"],[6,\"h4\"],[7],[0,\"Thank You ! Your message is sent.\"],[8],[0,\"\\n                \"],[1,[18,\"responseSendEmail\"],false],[0,\"\\n                \"],[6,\"p\"],[7],[0,\"To: \"],[1,[20,[\"model\",\"email\"]],false],[8],[0,\"\\n                \"],[6,\"p\"],[7],[0,\"Message: \"],[1,[20,[\"model\",\"message\"]],false],[8],[0,\"\\n                \"],[6,\"p\"],[7],[0,\"Reference ID: \"],[1,[20,[\"model\",\"id\"]],false],[8],[0,\"\\n            \"],[8],[0,\"\\n        \"],[8],[0,\"\\n\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"\\n        \"],[6,\"div\"],[10,\"class\",[26,[\"form-group has-feedback \",[25,\"if\",[[19,0,[\"model\",\"isValidEmail\"]],\"has-success\"],null]]]],[7],[0,\"\\n            \"],[6,\"label\"],[7],[0,\"Your email Address*:\"],[8],[0,\" \\n            \"],[1,[25,\"input\",null,[[\"type\",\"class\",\"placeholder\",\"value\",\"autofocus\"],[\"email\",\"form-control\",\"Your email address\",[19,0,[\"model\",\"email\"]],\"autofocus\"]]],false],[0,\"\\n\"],[4,\"if\",[[19,0,[\"model\",\"isValidEmail\"]]],null,{\"statements\":[[0,\"                \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-ok form-control-feedback\"],[9,\"aria-hidden\",\"true\"],[7],[8],[0,\"\\n                \"],[6,\"span\"],[9,\"id\",\"inputSuccess2Status\"],[9,\"class\",\"sr-only\"],[7],[0,\"(success)\"],[8],[0,\" \\n\"]],\"parameters\":[]},null],[0,\"        \"],[8],[0,\"\\n\\n        \"],[6,\"div\"],[10,\"class\",[26,[\"form-group has-feedback \",[25,\"if\",[[19,0,[\"model\",\"hasEnoughText\"]],\"has-success\"],null]]]],[7],[0,\"\\n            \"],[6,\"label\"],[7],[0,\"Your Message*:\"],[8],[0,\" \\n            \"],[1,[25,\"textarea\",null,[[\"class\",\"placeholder\",\"rows\",\"value\"],[\"form-control\",\"Your message. (At least 5 characters.)\",\"7\",[19,0,[\"model\",\"message\"]]]]],false],[0,\" \\n            \\n\"],[4,\"if\",[[19,0,[\"model\",\"hasEnoughText\"]]],null,{\"statements\":[[0,\"                \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-ok form-control-feedback\"],[9,\"aria-hidden\",\"true\"],[7],[8],[0,\"\\n                \"],[6,\"span\"],[9,\"id\",\"inputSuccess2Status\"],[9,\"class\",\"sr-only\"],[7],[0,\"(success)\"],[8],[0,\" \\n\"]],\"parameters\":[]},null],[0,\"        \"],[8],[0,\"\\n        \"],[6,\"button\"],[9,\"class\",\"btn btn-success\"],[10,\"disabled\",[20,[\"model\",\"isNotValid\"]],null],[3,\"action\",[[19,0,[]],\"sendEmail\",[19,0,[\"model\"]]]],[7],[0,\"Send\"],[8],[0,\" \"]],\"parameters\":[]}],[0,\"\\n\\n    \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/contact.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "ngHjek0d", "block": "{\"symbols\":[],\"statements\":[[6,\"h1\"],[7],[0,\"Contato\"],[8],[0,\"\\n\\n\"],[6,\"p\"],[9,\"class\",\"well well-sm\"],[7],[0,\"\\n    Se tiver alguma dúvida ou sugestão para de um Livro, mande um email!\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"row\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"col-md-6\"],[7],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"responseSendEmail\"]]],null,{\"statements\":[[0,\"            \\n            \"],[6,\"div\"],[9,\"class\",\"col-md-6\"],[7],[0,\"\\n            \\n                \"],[6,\"br\"],[7],[8],[0,\"\\n            \\n                \"],[6,\"div\"],[9,\"class\",\"alert alert-success\"],[7],[0,\"\\n                    \"],[6,\"h4\"],[7],[0,\"Obrigado! Seu email foi enviado.\"],[8],[0,\"\\n                    \\n                    \"],[6,\"p\"],[7],[0,\"Para: \"],[1,[20,[\"model\",\"email\"]],false],[8],[0,\"\\n                    \"],[6,\"p\"],[7],[0,\"Mensagem: \"],[1,[20,[\"model\",\"message\"]],false],[8],[0,\"\\n                    \"],[6,\"p\"],[7],[0,\"ID: \"],[1,[20,[\"model\",\"id\"]],false],[8],[0,\"\\n                \\n                \"],[8],[0,\"\\n            \\n            \"],[8],[0,\"\\n\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"\\n            \"],[6,\"div\"],[10,\"class\",[26,[\"form-group has-feedback \",[25,\"if\",[[19,0,[\"model\",\"isValidEmail\"]],\"has-success\"],null]]]],[7],[0,\"\\n                \"],[6,\"label\"],[7],[0,\"Seu endereço de email*:\"],[8],[0,\" \\n                \"],[1,[25,\"input\",null,[[\"type\",\"class\",\"placeholder\",\"value\",\"autofocus\"],[\"email\",\"form-control\",\"Digite seu email\",[19,0,[\"model\",\"email\"]],\"autofocus\"]]],false],[0,\"\\n\"],[4,\"if\",[[19,0,[\"model\",\"isValidEmail\"]]],null,{\"statements\":[[0,\"                    \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-ok form-control-feedback\"],[9,\"aria-hidden\",\"true\"],[7],[8],[0,\"\\n                    \"],[6,\"span\"],[9,\"id\",\"inputSuccess2Status\"],[9,\"class\",\"sr-only\"],[7],[0,\"(success)\"],[8],[0,\" \\n\"]],\"parameters\":[]},null],[0,\"            \"],[8],[0,\"\\n\\n            \"],[6,\"div\"],[10,\"class\",[26,[\"form-group has-feedback \",[25,\"if\",[[19,0,[\"model\",\"hasEnoughText\"]],\"has-success\"],null]]]],[7],[0,\"\\n                \"],[6,\"label\"],[7],[0,\"Sua mensagem*:\"],[8],[0,\" \\n                \"],[1,[25,\"textarea\",null,[[\"class\",\"placeholder\",\"rows\",\"value\"],[\"form-control\",\"Escreva sua mensagem. (Mínimo de 5 caracteres.)\",\"7\",[19,0,[\"model\",\"message\"]]]]],false],[0,\" \\n                \\n\"],[4,\"if\",[[19,0,[\"model\",\"hasEnoughText\"]]],null,{\"statements\":[[0,\"                    \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-ok form-control-feedback\"],[9,\"aria-hidden\",\"true\"],[7],[8],[0,\"\\n                    \"],[6,\"span\"],[9,\"id\",\"inputSuccess2Status\"],[9,\"class\",\"sr-only\"],[7],[0,\"(success)\"],[8],[0,\" \\n\"]],\"parameters\":[]},null],[0,\"            \"],[8],[0,\"\\n            \"],[6,\"button\"],[9,\"class\",\"btn btn-success\"],[10,\"disabled\",[20,[\"model\",\"isNotValid\"]],null],[3,\"action\",[[19,0,[]],\"sendEmail\",[19,0,[\"model\"]]]],[7],[0,\"Enviar\"],[8],[0,\" \\n\"]],\"parameters\":[]}],[0,\"\\n    \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/contact.hbs" } });
 });
 define("library-app/templates/index", ["exports"], function (exports) {
   "use strict";
@@ -1294,7 +1449,7 @@ define("library-app/templates/index", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "PGe2EMoI", "block": "{\"symbols\":[],\"statements\":[[6,\"div\"],[9,\"class\",\"jumotron text-center\"],[7],[0,\"\\n\\n    \"],[6,\"h1\"],[7],[0,\"Coming Soon\"],[8],[0,\"\\n\\n    \"],[6,\"br\"],[7],[8],[6,\"br\"],[7],[8],[0,\"\\n\\n    \"],[6,\"p\"],[7],[0,\"\\n        Don't miss our launch date, request an invitation now.\\n    \"],[8],[0,\"\\n\\n\\n    \"],[6,\"div\"],[9,\"class\",\"form-horizontal form-group form-group-lg row\"],[7],[0,\"\\n        \\n        \"],[6,\"div\"],[9,\"class\",\"col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-1 col-md-5 col-md-offset-2\"],[7],[0,\"\\n            \"],[2,\"\\n            <input type=\\\"email\\\" class=\\\"form-control\\\" placeholder=\\\"Please type your e-mail address.\\\" autofocus=\\\"autofocus\\\" />\\n            \"],[0,\"\\n            \"],[1,[25,\"input\",null,[[\"type\",\"value\",\"class\",\"placeholder\",\"autofocus\"],[\"email\",[19,0,[\"emailAddress\"]],\"form-control\",\"Please type your e-mail address.\",\"autofocus\"]]],false],[0,\"\\n        \"],[8],[0,\"\\n        \\n        \"],[6,\"div\"],[9,\"class\",\"col-xs-10 col-xs-offset-1 col-sm-offset-0 col-sm-4 col-md-3\"],[7],[0,\"\\n            \"],[6,\"button\"],[10,\"disabled\",[18,\"isDisabled\"],null],[9,\"class\",\"btn btn-primary btn-lg btn-block\"],[3,\"action\",[[19,0,[]],\"saveInvitation\"]],[7],[0,\"Request invitation\"],[8],[0,\"\\n        \"],[8],[0,\"\\n    \\n    \"],[8],[0,\"\\n\"],[4,\"if\",[[19,0,[\"responseMessage\"]]],null,{\"statements\":[[0,\"        \"],[6,\"div\"],[9,\"class\",\"alert alert-success\"],[7],[0,\"\\n            \"],[1,[18,\"responseMessage\"],false],[0,\"\\n        \"],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"    \"],[6,\"br\"],[7],[8],[6,\"br\"],[7],[8],[0,\"\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/index.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "GQX37lyT", "block": "{\"symbols\":[],\"statements\":[[6,\"div\"],[9,\"class\",\"jumbotron text-center\"],[7],[0,\"\\n\\n    \"],[6,\"h1\"],[7],[0,\"Em breve\"],[8],[0,\"\\n\\n    \"],[6,\"br\"],[7],[8],[6,\"br\"],[7],[8],[0,\"\\n\\n    \"],[6,\"p\"],[7],[0,\"\\n        Garanta agora seu convite para o lançamento novos livros!!!     \\n    \"],[8],[0,\"\\n\\n\\n    \"],[6,\"div\"],[9,\"class\",\"form-horizontal form-group form-group-lg row\"],[7],[0,\"\\n        \\n        \"],[6,\"div\"],[9,\"class\",\"col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-1 col-md-5 col-md-offset-2\"],[7],[0,\"\\n            \"],[1,[25,\"input\",null,[[\"type\",\"value\",\"class\",\"placeholder\",\"autofocus\"],[\"email\",[19,0,[\"emailAddress\"]],\"form-control\",\"Por favor, digite seu e-mail.\",\"autofocus\"]]],false],[0,\"\\n        \"],[8],[0,\"\\n        \\n        \"],[6,\"div\"],[9,\"class\",\"col-xs-10 col-xs-offset-1 col-sm-offset-0 col-sm-4 col-md-3\"],[7],[0,\"\\n            \"],[6,\"button\"],[10,\"disabled\",[18,\"isDisabled\"],null],[9,\"class\",\"btn btn-primary btn-lg btn-block\"],[3,\"action\",[[19,0,[]],\"saveInvitation\"]],[7],[0,\"Pedir convite\"],[8],[0,\"\\n        \"],[8],[0,\"\\n    \\n    \"],[8],[0,\"\\n\"],[4,\"if\",[[19,0,[\"responseMessage\"]]],null,{\"statements\":[[0,\"        \"],[6,\"div\"],[9,\"class\",\"alert alert-success\"],[7],[0,\"\\n            \"],[1,[18,\"responseMessage\"],false],[0,\"\\n        \"],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"    \"],[6,\"br\"],[7],[8],[6,\"br\"],[7],[8],[0,\"\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/index.hbs" } });
 });
 define("library-app/templates/libraries", ["exports"], function (exports) {
   "use strict";
@@ -1302,15 +1457,7 @@ define("library-app/templates/libraries", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "in8HtRi/", "block": "{\"symbols\":[],\"statements\":[[2,\" app/templates/libraries.hbs \"],[0,\"\\n\"],[6,\"h1\"],[7],[0,\"Libraries\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"well\"],[7],[0,\"\\n  \"],[6,\"ul\"],[9,\"class\",\"nav nav-pills\"],[7],[0,\"\\n    \"],[4,\"link-to\",[\"libraries.index\"],[[\"tagName\"],[\"li\"]],{\"statements\":[[6,\"a\"],[9,\"href\",\"\"],[7],[0,\"List all\"],[8]],\"parameters\":[]},null],[0,\"\\n    \"],[4,\"link-to\",[\"libraries.new\"],[[\"tagName\"],[\"li\"]],{\"statements\":[[6,\"a\"],[9,\"href\",\"\"],[7],[0,\"Add new\"],[8]],\"parameters\":[]},null],[0,\"\\n  \"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[2,\" Aqui renderizará o conteudo de libraries/index.hbs \"],[0,\" \\n\"],[1,[18,\"outlet\"],false]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/libraries.hbs" } });
-});
-define("library-app/templates/libraries/edit", ["exports"], function (exports) {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.default = Ember.HTMLBars.template({ "id": "HNtYfSDB", "block": "{\"symbols\":[],\"statements\":[[2,\" app/templates/libraries/new.hbs \"],[0,\"\\n\"],[2,\"\\n<h2>Edit Library</h2>\\n\\n<div class=\\\"form-horizontal\\\">\\n  <div class=\\\"form-group\\\">\\n    <label class=\\\"col-sm-2 control-label\\\">Name</label>\\n    <div class=\\\"col-sm-10\\\">\\n      {{input type=\\\"text\\\" value=model.name class=\\\"form-control\\\" placeholder=\\\"The name of the Library\\\"}}\\n    </div>\\n  </div>\\n  <div class=\\\"form-group\\\">\\n    <label class=\\\"col-sm-2 control-label\\\">Address</label>\\n    <div class=\\\"col-sm-10\\\">\\n      {{input type=\\\"text\\\" value=model.address class=\\\"form-control\\\" placeholder=\\\"The address of the Library\\\"}}\\n    </div>\\n  </div>\\n  <div class=\\\"form-group\\\">\\n    <label class=\\\"col-sm-2 control-label\\\">Phone</label>\\n    <div class=\\\"col-sm-10\\\">\\n      {{input type=\\\"text\\\" value=model.phone class=\\\"form-control\\\" placeholder=\\\"The phone number of the Library\\\"}}\\n    </div>\\n  </div>\\n  <div class=\\\"form-group\\\">\\n    <div class=\\\"col-sm-offset-2 col-sm-10\\\">\\n      <button type=\\\"submit\\\" class=\\\"btn btn-default\\\" {{action 'saveLibrary' model}}>Save Changes</button>\\n    </div>\\n  </div>\\n</div>\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/libraries/edit.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "FJSifHIS", "block": "{\"symbols\":[],\"statements\":[[2,\" app/templates/libraries.hbs \"],[0,\"\\n\"],[6,\"h1\"],[7],[0,\"Bibliotecas\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"well\"],[7],[0,\"\\n  \"],[6,\"ul\"],[9,\"class\",\"nav nav-tabs\"],[7],[0,\"\\n    \"],[4,\"link-to\",[\"libraries.index\"],[[\"tagName\"],[\"li\"]],{\"statements\":[[6,\"a\"],[9,\"href\",\"\"],[7],[0,\"Listar\"],[8]],\"parameters\":[]},null],[0,\"\\n    \"],[4,\"link-to\",[\"libraries.new\"],[[\"tagName\"],[\"li\"]],{\"statements\":[[6,\"a\"],[9,\"href\",\"\"],[7],[0,\"Novo\"],[8]],\"parameters\":[]},null],[0,\"\\n  \"],[8],[0,\"\\n\"],[8],[0,\"\\n\"],[2,\" Aqui renderizará o conteudo de libraries/index.hbs \"],[0,\" \\n\"],[1,[18,\"outlet\"],false]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/libraries.hbs" } });
 });
 define("library-app/templates/libraries/form", ["exports"], function (exports) {
   "use strict";
@@ -1318,7 +1465,7 @@ define("library-app/templates/libraries/form", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "gNN6vtoG", "block": "{\"symbols\":[],\"statements\":[[2,\" app/templates/libraries/form.hbs \"],[0,\"\\n\"],[2,\" Esse é um template q substui o new.hbs e o edit pois serem muito paraceidos.\\nA unica coisa q muda em ambos é o titulo e o label do botão.\\na route/new.js e o route/edit.js fazem a alteracão desse itens \\n\"],[0,\"\\n\"],[6,\"h2\"],[7],[1,[18,\"title\"],false],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"row\"],[7],[0,\"\\n\\n  \"],[6,\"div\"],[9,\"class\",\"col-md-6\"],[7],[0,\"\\n    \"],[2,\" Faz uso de um outro template de fomulario que fica  esquerda da tela\"],[0,\"\\n    \"],[1,[25,\"library-item-form\",null,[[\"item\",\"buttonLabel\",\"action\"],[[19,0,[\"model\"]],[19,0,[\"buttonLabel\"]],\"saveLibrary\"]]],false],[0,\"    \\n  \"],[8],[0,\"\\n\\n  \"],[6,\"div\"],[9,\"class\",\"col-md-4\"],[7],[0,\"\\n    \"],[2,\" Faz uso de um outro template que é um card q recebe as informações do fomulário dicamicamente \"],[0,\"\\n\"],[4,\"library-item\",null,[[\"item\"],[[19,0,[\"model\"]]]],{\"statements\":[[0,\"      \"],[6,\"br\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"  \"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/libraries/form.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "MNpkDyNF", "block": "{\"symbols\":[],\"statements\":[[2,\" app/templates/libraries/form.hbs \"],[0,\"\\n\"],[2,\" \\n    O link libraries.new chamara a route.js (this.route('new');)\\n    Em seguida o routes/libraries/new.js renderizará o libraries/form.hbs \\n    usando o metodo  renderTemplate()\\n \"],[0,\"\\n\"],[6,\"h2\"],[7],[1,[18,\"title\"],false],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"row\"],[7],[0,\"\\n\\n  \"],[6,\"div\"],[9,\"class\",\"col-md-6\"],[7],[0,\"\\n    \"],[2,\" Faz uso de um componente library-item-form(library-item-form.hbs), que fica  esquerda da tela\"],[0,\"\\n    \"],[1,[25,\"library-item-form\",null,[[\"item\",\"buttonLabel\",\"action\"],[[19,0,[\"model\"]],[19,0,[\"buttonLabel\"]],\"saveLibrary\"]]],false],[0,\"    \\n  \"],[8],[0,\"\\n\\n  \"],[6,\"div\"],[9,\"class\",\"col-md-4\"],[7],[0,\"\\n    \"],[2,\" Faz uso de um outro um componente library-item(library-item.hbs) que é um card q recebe as informações do fomulário dicamicamente \"],[0,\"\\n\"],[4,\"library-item\",null,[[\"item\"],[[19,0,[\"model\"]]]],{\"statements\":[[0,\"      \"],[6,\"br\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"  \"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/libraries/form.hbs" } });
 });
 define("library-app/templates/libraries/index", ["exports"], function (exports) {
   "use strict";
@@ -1326,15 +1473,7 @@ define("library-app/templates/libraries/index", ["exports"], function (exports) 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "ddDV3qJO", "block": "{\"symbols\":[\"library\"],\"statements\":[[2,\" app/templates/libraries/index.hbs \"],[0,\"\\n\"],[6,\"h2\"],[7],[0,\"List\"],[8],[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"row\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"model\"]]],null,{\"statements\":[[0,\"  \"],[6,\"div\"],[9,\"class\",\"col-md-4\"],[7],[0,\"\\n\"],[4,\"library-item\",null,[[\"item\"],[[19,1,[]]]],{\"statements\":[[0,\"      \"],[4,\"link-to\",[\"libraries.edit\",[19,1,[\"id\"]]],[[\"class\"],[\"btn btn success btn-xs\"]],{\"statements\":[[0,\"Edit\"]],\"parameters\":[]},null],[0,\"\\n      \"],[6,\"button\"],[9,\"class\",\"btn btn-danger btn-xs\"],[3,\"action\",[[19,0,[]],\"deleteLibrary\",[19,1,[]]]],[7],[0,\"Delete\"],[8],[0,\" \\n\"]],\"parameters\":[]},null],[0,\"  \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[8],[0,\"\\n\\n\\n\"],[2,\"\\n<div class=\\\"row\\\">\\n\\n{{#each model as |library|}}\\n\\n  <div class=\\\"col-md-4\\\">\\n\\n    <div class=\\\"panel panel-default library-item\\\">\\n\\n      <div class=\\\"panel-heading\\\">\\n        <h3 class=\\\"panel-title\\\">{{library.name}}</h3>\\n      </div>\\n      <div class=\\\"panel-body\\\">\\n        <p>Address: {{library.address}}</p>\\n        <p>Phone: {{library.phone}}</p>\\n      </div>\\n\\n      <div class=\\\"panel-footer text-right\\\">\\n        {{#link-to \\\"libraries.edit\\\" library.id class=\\\"btn btn success btn-xs\\\" }}Edit{{/link-to}}\\n        <button class=\\\"btn btn-danger btn-xs\\\" {{ action 'deleteLibrary' library }}>Delete</button>\\n      </div>\\n\\n    </div>\\n\\n  </div>\\n\\n  {{/each}}\\n</div>\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/libraries/index.hbs" } });
-});
-define("library-app/templates/libraries/new", ["exports"], function (exports) {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.default = Ember.HTMLBars.template({ "id": "o45O5giu", "block": "{\"symbols\":[],\"statements\":[[2,\" app/templates/libraries/new.hbs \"],[0,\"\\n\"],[2,\"\\n<h2>Add a new local Library</h2>\\n\\n<div class=\\\"row\\\">\\n\\n  <div class=\\\"col-md-6\\\">\\n    {{library-item-form item=model buttonLabel=\\\"Add to library list\\\" action=\\\"saveLibrary\\\"}}    \\n  </div>\\n\\n  <div class=\\\"col-md-4\\\">\\n{{#library-item item=model}}\\n      <br/>\\n    {{/library-item}}  </div>\\n</div>\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/libraries/new.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "tKvh3dmd", "block": "{\"symbols\":[\"library\"],\"statements\":[[2,\" app/templates/libraries/index.hbs \"],[0,\"\\n\"],[6,\"h2\"],[7],[0,\"Lista de Bibliotecas\"],[8],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"model\"]]],null,{\"statements\":[[0,\"    \"],[6,\"div\"],[9,\"class\",\"row\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"model\"]]],null,{\"statements\":[[0,\"            \"],[6,\"div\"],[9,\"class\",\"col-md-4\"],[7],[0,\"\\n              \"],[2,\" o componente library-item.hbs recebe um obj library como parametro  \"],[0,\"\\n\"],[4,\"library-item\",null,[[\"item\"],[[19,1,[]]]],{\"statements\":[[0,\"                \"],[4,\"link-to\",[\"libraries.edit\",[19,1,[\"id\"]]],[[\"class\"],[\"btn btn success btn-xs\"]],{\"statements\":[[0,\"Edtar\"]],\"parameters\":[]},null],[0,\"\\n                \"],[6,\"button\"],[9,\"class\",\"btn btn-danger btn-xs\"],[3,\"action\",[[19,0,[]],\"deleteLibrary\",[19,1,[]]]],[7],[0,\"Remover\"],[8],[0,\" \\n\"]],\"parameters\":[]},null],[0,\"            \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"    \"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"    \"],[6,\"div\"],[9,\"class\",\"alert alert-info\"],[9,\"role\",\"alert\"],[7],[0,\"Nenhum registro encontrado...\"],[8],[0,\" \\n\"]],\"parameters\":[]}]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/libraries/index.hbs" } });
 });
 define("library-app/templates/navbar", ["exports"], function (exports) {
   "use strict";
@@ -1342,7 +1481,7 @@ define("library-app/templates/navbar", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "0msKLEis", "block": "{\"symbols\":[],\"statements\":[[2,\" app/templates/navbar.hbs \"],[0,\"\\n\"],[6,\"nav\"],[9,\"class\",\"navbar navbar-inverse\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"container-fluid\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"navbar-header\"],[7],[0,\"\\n            \"],[6,\"button\"],[9,\"type\",\"button\"],[9,\"class\",\"navbar-toggle collapsed\"],[9,\"data-toggle\",\"collapse\"],[9,\"data-target\",\"#main-navbar\"],[7],[0,\"\\n                \"],[6,\"span\"],[9,\"class\",\"sr-only\"],[7],[0,\"Toggle navigation\"],[8],[0,\"\\n                \"],[6,\"span\"],[9,\"class\",\"icon-bar\"],[7],[8],[0,\"\\n                \"],[6,\"span\"],[9,\"class\",\"icon-bar\"],[7],[8],[0,\"\\n                \"],[6,\"span\"],[9,\"class\",\"icon-bar\"],[7],[8],[0,\"\\n            \"],[8],[0,\" \"],[4,\"link-to\",[\"index\"],[[\"class\"],[\"navbar-brand\"]],{\"statements\":[[0,\"Library App\"]],\"parameters\":[]},null],[0,\"\\n        \"],[8],[0,\"\\n\\n        \"],[6,\"div\"],[9,\"class\",\"collapse navbar-collapse\"],[9,\"id\",\"main-navbar\"],[7],[0,\"\\n            \"],[6,\"ul\"],[9,\"class\",\"nav navbar-nav\"],[7],[0,\"\\n                \"],[4,\"nav-link-to\",[\"index\"],null,{\"statements\":[[0,\"Home\"]],\"parameters\":[]},null],[0,\" \\n                \"],[4,\"nav-link-to\",[\"libraries\"],null,{\"statements\":[[0,\"Libraries\"]],\"parameters\":[]},null],[0,\"\\n                \"],[4,\"nav-link-to\",[\"authors\"],null,{\"statements\":[[0,\"Authors\"]],\"parameters\":[]},null],[0,\"\\n                \"],[4,\"nav-link-to\",[\"books\"],null,{\"statements\":[[0,\"Books\"]],\"parameters\":[]},null],[0,\" \\n                \\n            \"],[8],[0,\"\\n\\n            \"],[6,\"ul\"],[9,\"class\",\"nav navbar-nav navbar-right\"],[7],[0,\"\\n                \"],[4,\"nav-link-to\",[\"about\"],null,{\"statements\":[[0,\"About\"]],\"parameters\":[]},null],[0,\"\\n                \"],[4,\"nav-link-to\",[\"contact\"],null,{\"statements\":[[0,\"Contact\"]],\"parameters\":[]},null],[0,\"\\n                \"],[6,\"li\"],[9,\"class\",\"dropdown\"],[7],[0,\"\\n                    \"],[6,\"a\"],[9,\"class\",\"dropdown-toggle\"],[9,\"data-toggle\",\"dropdown\"],[9,\"role\",\"button\"],[9,\"aria-haspopup\",\"true\"],[9,\"aria-expanded\",\"false\"],[7],[0,\"\\n                            Admin\\n                            \"],[6,\"span\"],[9,\"class\",\"caret\"],[7],[8],[0,\"\\n                        \"],[8],[0,\"\\n                    \"],[6,\"ul\"],[9,\"class\",\"dropdown-menu\"],[7],[0,\"\\n                        \"],[4,\"nav-link-to\",[\"admin.invitations\"],null,{\"statements\":[[0,\"Invitations\"]],\"parameters\":[]},null],[0,\" \\n                        \"],[4,\"nav-link-to\",[\"admin.contacts\"],null,{\"statements\":[[0,\"Contacts\"]],\"parameters\":[]},null],[0,\"\\n                        \"],[4,\"nav-link-to\",[\"admin.seeder\"],null,{\"statements\":[[0,\"Seeder\"]],\"parameters\":[]},null],[0,\"\\n                    \"],[8],[0,\"\\n                \"],[8],[0,\"\\n            \"],[8],[0,\"\\n            \"],[2,\" end menu dropdown \"],[0,\"\\n        \"],[8],[0,\"\\n        \"],[2,\" /.navbar-collapse \"],[0,\"\\n    \"],[8],[0,\"\\n    \"],[2,\" /.container-fluid \"],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/navbar.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "louUBDwb", "block": "{\"symbols\":[],\"statements\":[[2,\" app/templates/navbar.hbs \"],[0,\"\\n\"],[6,\"nav\"],[9,\"class\",\"navbar navbar-inverse\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"container-fluid\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"navbar-header\"],[7],[0,\"\\n            \"],[6,\"button\"],[9,\"type\",\"button\"],[9,\"class\",\"navbar-toggle collapsed\"],[9,\"data-toggle\",\"collapse\"],[9,\"data-target\",\"#main-navbar\"],[7],[0,\"\\n                \"],[6,\"span\"],[9,\"class\",\"sr-only\"],[7],[0,\"Toggle navigation\"],[8],[0,\"\\n                \"],[6,\"span\"],[9,\"class\",\"icon-bar\"],[7],[8],[0,\"\\n                \"],[6,\"span\"],[9,\"class\",\"icon-bar\"],[7],[8],[0,\"\\n                \"],[6,\"span\"],[9,\"class\",\"icon-bar\"],[7],[8],[0,\"\\n            \"],[8],[0,\" \"],[4,\"link-to\",[\"index\"],[[\"class\"],[\"navbar-brand\"]],{\"statements\":[[0,\"Biblio App\"]],\"parameters\":[]},null],[0,\"\\n        \"],[8],[0,\"\\n\\n        \"],[6,\"div\"],[9,\"class\",\"collapse navbar-collapse\"],[9,\"id\",\"main-navbar\"],[7],[0,\"\\n            \"],[6,\"ul\"],[9,\"class\",\"nav navbar-nav\"],[7],[0,\"\\n                \"],[4,\"nav-link-to\",[\"index\"],null,{\"statements\":[[0,\"Home\"]],\"parameters\":[]},null],[0,\" \\n                \"],[4,\"nav-link-to\",[\"libraries\"],null,{\"statements\":[[0,\"Bibliotecas\"]],\"parameters\":[]},null],[0,\"\\n                \"],[4,\"nav-link-to\",[\"authors\"],null,{\"statements\":[[0,\"Autores\"]],\"parameters\":[]},null],[0,\"\\n                \"],[4,\"nav-link-to\",[\"books\"],null,{\"statements\":[[0,\"Livros\"]],\"parameters\":[]},null],[0,\" \\n                \\n            \"],[8],[0,\"\\n \\n            \"],[6,\"ul\"],[9,\"class\",\"nav navbar-nav navbar-right\"],[7],[0,\"\\n                \"],[4,\"nav-link-to\",[\"about\"],null,{\"statements\":[[0,\"Sobre\"]],\"parameters\":[]},null],[0,\"\\n                \"],[4,\"nav-link-to\",[\"contact\"],null,{\"statements\":[[0,\"Contato\"]],\"parameters\":[]},null],[0,\"\\n                \"],[6,\"li\"],[9,\"class\",\"dropdown\"],[7],[0,\"\\n                    \"],[6,\"a\"],[9,\"class\",\"dropdown-toggle\"],[9,\"data-toggle\",\"dropdown\"],[9,\"role\",\"button\"],[9,\"aria-haspopup\",\"true\"],[9,\"aria-expanded\",\"false\"],[7],[0,\"\\n                            Admin\\n                            \"],[6,\"span\"],[9,\"class\",\"caret\"],[7],[8],[0,\"\\n                        \"],[8],[0,\"\\n                    \"],[6,\"ul\"],[9,\"class\",\"dropdown-menu\"],[7],[0,\"\\n                        \"],[4,\"nav-link-to\",[\"admin.invitations\"],null,{\"statements\":[[0,\"Convite\"]],\"parameters\":[]},null],[0,\" \\n                        \"],[4,\"nav-link-to\",[\"admin.contacts\"],null,{\"statements\":[[0,\"Contatos\"]],\"parameters\":[]},null],[0,\"\\n                        \"],[4,\"nav-link-to\",[\"admin.seeder\"],null,{\"statements\":[[0,\"Populador de Dados\"]],\"parameters\":[]},null],[0,\" \\n                    \"],[8],[0,\"\\n                \"],[8],[0,\"\\n            \"],[8],[0,\"\\n            \"],[2,\" end menu dropdown \"],[0,\"\\n        \"],[8],[0,\"\\n        \"],[2,\" /.navbar-collapse \"],[0,\"\\n    \"],[8],[0,\"\\n    \"],[2,\" /.container-fluid \"],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "library-app/templates/navbar.hbs" } });
 });
 define('library-app/torii-providers/firebase', ['exports', 'emberfire/torii-providers/firebase'], function (exports, _firebase) {
   'use strict';
@@ -1374,6 +1513,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("library-app/app")["default"].create({"LOG_ACTIVE_GENERATION":true,"LOG_TRANSITIONS":true,"LOG_TRANSITIONS_INTERNAL":true,"LOG_VIEW_LOOKUPS":true,"name":"library-app","version":"0.0.0+f8868e46"});
+  require("library-app/app")["default"].create({"LOG_ACTIVE_GENERATION":true,"LOG_TRANSITIONS":true,"LOG_TRANSITIONS_INTERNAL":true,"LOG_VIEW_LOOKUPS":true,"name":"library-app","version":"0.0.0+a1cc6b4f"});
 }
 //# sourceMappingURL=library-app.map

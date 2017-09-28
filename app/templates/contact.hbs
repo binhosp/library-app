@@ -1,56 +1,62 @@
-<h1>Contact Page</h1>
+<h1>Contato</h1>
 
 <p class="well well-sm">
-    If you have any question or feedback please leave a message with your email address.
+    Se tiver alguma dúvida ou sugestão para de um Livro, mande um email!
 </p>
 
 <div class="row">
     <div class="col-md-6">
 
         {{#if responseSendEmail}}
-        <div class="col-md-6">
-            <br/>
-            <div class="alert alert-success">
-                <h4>Thank You ! Your message is sent.</h4>
-                {{responseSendEmail}}
-                <p>To: {{model.email}}</p>
-                <p>Message: {{model.message}}</p>
-                <p>Reference ID: {{model.id}}</p>
+            
+            <div class="col-md-6">
+            
+                <br/>
+            
+                <div class="alert alert-success">
+                    <h4>Obrigado! Seu email foi enviado.</h4>
+                    
+                    <p>Para: {{model.email}}</p>
+                    <p>Mensagem: {{model.message}}</p>
+                    <p>ID: {{model.id}}</p>
+                
+                </div>
+            
             </div>
-        </div>
 
         {{else}}
 
-        <div class="form-group has-feedback {{if model.isValidEmail 'has-success'}}">
-            <label>Your email Address*:</label> 
-            {{
-                input type="email" 
-                class="form-control" 
-                placeholder="Your email address"
-                value=model.email 
-                autofocus="autofocus"
-            }}
-            {{#if model.isValidEmail}} 
-                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
-                <span id="inputSuccess2Status" class="sr-only">(success)</span> 
-            {{/if}}
-        </div>
+            <div class="form-group has-feedback {{if model.isValidEmail 'has-success'}}">
+                <label>Seu endereço de email*:</label> 
+                {{
+                    input type="email" 
+                    class="form-control" 
+                    placeholder="Digite seu email"
+                    value=model.email 
+                    autofocus="autofocus"
+                }}
+                {{#if model.isValidEmail}} 
+                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                    <span id="inputSuccess2Status" class="sr-only">(success)</span> 
+                {{/if}}
+            </div>
 
-        <div class="form-group has-feedback {{if model.hasEnoughText 'has-success'}}">
-            <label>Your Message*:</label> 
-            {{
-                textarea class="form-control" 
-                placeholder="Your message. (At least 5 characters.)" 
-                rows="7" 
-                value=model.message 
-            }} 
-            
-            {{#if model.hasEnoughText}}
-                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
-                <span id="inputSuccess2Status" class="sr-only">(success)</span> 
-            {{/if}}
-        </div>
-        <button class="btn btn-success" disabled={{model.isNotValid}} {{action "sendEmail" model}}>Send</button> {{/if}}
+            <div class="form-group has-feedback {{if model.hasEnoughText 'has-success'}}">
+                <label>Sua mensagem*:</label> 
+                {{
+                    textarea class="form-control" 
+                    placeholder="Escreva sua mensagem. (Mínimo de 5 caracteres.)" 
+                    rows="7" 
+                    value=model.message 
+                }} 
+                
+                {{#if model.hasEnoughText}}
+                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                    <span id="inputSuccess2Status" class="sr-only">(success)</span> 
+                {{/if}}
+            </div>
+            <button class="btn btn-success" disabled={{model.isNotValid}} {{action "sendEmail" model}}>Enviar</button> 
+        {{/if}}
 
     </div>
 </div>

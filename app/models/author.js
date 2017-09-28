@@ -16,7 +16,7 @@ export default DS.Model.extend({
     Faker.locale ='pt_BR';
     Faker.localeFallback ='pt_BR';
     this.set('name', Faker.name.findName());
-    console.log(this.get('name'));
+    //console.log(this.get('name'));
     return this;
   } 
 });

@@ -1,19 +1,20 @@
 <!-- app/templates/libraries/form.hbs -->
-<!-- Esse é um template q substui o new.hbs e o edit pois serem muito paraceidos.
-A unica coisa q muda em ambos é o titulo e o label do botão.
-a route/new.js e o route/edit.js fazem a alteracão desse itens 
--->
+<!-- 
+    O link libraries.new chamara a route.js (this.route('new');)
+    Em seguida o routes/libraries/new.js renderizará o libraries/form.hbs 
+    usando o metodo  renderTemplate()
+ -->
 <h2>{{title}}</h2>
 
 <div class="row">
 
   <div class="col-md-6">
-    <!-- Faz uso de um outro template de fomulario que fica  esquerda da tela-->
+    <!-- Faz uso de um componente library-item-form(library-item-form.hbs), que fica  esquerda da tela-->
     {{library-item-form item=model buttonLabel=buttonLabel action="saveLibrary"}}    
   </div>
 
   <div class="col-md-4">
-    <!-- Faz uso de um outro template que é um card q recebe as informações do fomulário dicamicamente -->
+    <!-- Faz uso de um outro um componente library-item(library-item.hbs) que é um card q recebe as informações do fomulário dicamicamente -->
     {{#library-item item=model}}
       <br/>
     {{/library-item}}

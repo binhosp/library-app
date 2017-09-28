@@ -4,25 +4,26 @@ import Faker from 'faker';
 
 export default Ember.Controller.extend({
 
-  
+
   actions: {
-    
+
     generateLibraries(volume) {
 
-      // Progress flag, data-down to seeder-block where our lovely button will show a spinner...
-      this.set('generateLibrariesInProgress', true);
-    
-      
-      const counter = parseInt(volume);
-      let savedLibraries = [];
+      //console.log('qntde de libraries para gerar : ' + volume);
 
+      // true para mostar a icone spinner.
+      this.set('generateLibrariesInProgress', true);
+
+      const counter = parseInt(volume);
+
+      let savedLibraries = [];
       for (let i = 0; i < counter; i++) {
 
-        // Collect all Promise in an array
+        // cria e adiciona no array um library gerado
         savedLibraries.push(this._saveRandomLibrary());
       }
 
-      // Wait for all Promise to fulfill so we can show our label and turn off the spinner.
+      // Espera o promisse terminar para desligar o spinner e mostrar o fader-label.
       Ember.RSVP.all(savedLibraries)
         .then(() => {
           this.set('generateLibrariesInProgress', false);
@@ -32,14 +33,14 @@ export default Ember.Controller.extend({
 
     deleteLibraries() {
 
-      // Progress flag, data-down to seeder-block button spinner.
+      // true para mostar a icone spinner qndo deletar
       this.set('deleteLibrariesInProgress', true);
 
-      // Our local _destroyAll return a promise, we change the label when all records destroyed.
+      // O _destroyAll retorna uma promisse e mudamos o label quandos todas as linha forem removidas.
       this._destroyAll(this.get('libraries'))
 
-        // Data down via seeder-block to fader-label that we ready to show the label.
-        // Change the progress indicator also, so the spinner can be turned off.
+        // A remoção feita através do seeder-block para o fader-label para poder mostar no label.
+        // Mudar o indicador de progresso e deslicar o spinner.
         .then(() => {
           this.set('libDelDone', true);
           this.set('deleteLibrariesInProgress', false);
@@ -48,7 +49,7 @@ export default Ember.Controller.extend({
 
     generateBooksAndAuthors(volume) {
 
-      // Progress flag, data-down to seeder-block button spinner.
+      // true para mostar a icone spinner.
       this.set('generateBooksInProgress', true);
 
       const counter = parseInt(volume);
@@ -56,16 +57,16 @@ export default Ember.Controller.extend({
 
       for (let i = 0; i < counter; i++) {
 
-        // Collect Promises in an array.
+        // cria e adiciona no array um book gerado.
         const books = this._saveRandomAuthor().then(newAuthor => this._generateSomeBooks(newAuthor));
         booksWithAuthors.push(books);
       }
 
-      // Let's wait until all async save resolved, show a label and turn off the spinner.
+      // Espera que o save assincrono termine para assim deligar o spinner e mostrar o fader-label.
       Ember.RSVP.all(booksWithAuthors)
 
-        // Data down via seeder-block to fader-label that we ready to show the label
-        // Change the progress flag also, so the spinner can be turned off.
+        // A remoção feita através do seeder-block para o fader-label para poder mostar no label.
+        // Mudar o indicador de progresso e deslicar o spinner.
         .then(() => {
           this.set('authDone', true);
           this.set('generateBooksInProgress', false);
@@ -74,18 +75,18 @@ export default Ember.Controller.extend({
 
     deleteBooksAndAuthors() {
 
-      // Progress flag, data-down to seeder-block button to show spinner.
+       // true para mostar a icone spinner.
       this.set('deleteBooksInProgress', true);
 
       const authors = this.get('authors');
       const books = this.get('books');
 
-      // Remove authors first and books later, finally show the label.
+      // Remove primeira os autores e os livros depois, e no final mostra o label.
       this._destroyAll(authors)
         .then(() => this._destroyAll(books))
 
-        // Data down via seeder-block to fader-label that we ready to show the label
-        // Delete is finished, we can turn off the spinner in seeder-block button.
+        // A remoção feita através do seeder-block para o fader-label para poder mostar no label.
+        // Mudar o indicador de progresso e deslicar o spinner.
         .then(() => {
           this.set('authDelDone', true);
           this.set('deleteBooksInProgress', false);
@@ -93,10 +94,9 @@ export default Ember.Controller.extend({
     }
   },
 
-  // Private methods
-
-  // Create a new library record and uses the randomizator, which is in our model and generates some fake data in
-  // the new record. After we save it, which is a promise, so this returns a promise.
+  //Metodos privados
+  // Cria uma record de library record usando o randomizador do faker que ira colocar dados fake no model
+  // Depois disso salva e retorna uma promisse
   _saveRandomLibrary() {
     return this.store.createRecord('library').randomize().save();
   },
@@ -112,27 +112,33 @@ export default Ember.Controller.extend({
     for (let j = 0; j < bookCounter; j++) {
       const library = this._selectRandomLibrary();
 
-      // Creating and saving book, saving the related records also are take while, they are all a Promise.
+      // Cria e salva um book, salvando as record relacionadas. isso leva um tempo pois todos são promisses.
       const bookPromise =
         this.store.createRecord('book')
           .randomize(author, library)
           .save()
           .then(() => author.save())
 
-          // guard library in case if we don't have any
+          // Guarda um Library caso não tenha nenhuma
           .then(() => library && library.save());
       books.push(bookPromise)
     }
 
-    // Return a Promise, so we can manage the whole process on time
+    // Retorna um a promisse para que possamos gerenciat o tempo de processamento
     return Ember.RSVP.all(books);
   },
 
   _selectRandomLibrary() {
 
+    // As Libraries são records da store, ou seja, é um DS.RecordArray
+
     // Please note libraries are records from store, which means this is a DS.RecordArray object, it is extended from
     // Ember.ArrayProxy. If you need an element from this list, you cannot just use libraries[3], we have to use
     // libraries.objectAt(3)
+
+    /**
+     * Como as Libraries Ember.ArrayProxy
+     */
     const libraries = this.get('libraries');
     const size = libraries.get('length');
 

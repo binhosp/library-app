@@ -1,13 +1,20 @@
 <div class="panel panel-default library-item">
 
     <div class="panel-heading">
-        <h3 class="panel-title">{{item.name}}</h3>
+        <h3 class="panel-title">Titulo: {{item.name}}</h3>
     </div>
     <div class="panel-body">
-        <p>Address: {{item.address}}</p>
-        <p>Phone: {{item.phone}}</p>
+        <p>Endereço: {{item.address}}</p>
+        <p>Telefone: {{item.phone}}</p>
     </div>
     <div class="panel-footer text-right">
+        <!-- O campo {{yield}} significa que podemos usar esse componente como um componente de bloco. 
+        O código que este componente envolve será injetado dentro do {{yield}}
+        Por exemplo:
+        {{#library-item item=model}}
+        <br/>
+        {{/library-item}}
+        -->
         {{yield}}
     </div>
 

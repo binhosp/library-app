@@ -16,7 +16,7 @@ export default DS.Model.extend({
     Faker.localeFallback ='pt_BR';
     
     this.set('title', this._bookTitle());
-    console.log(this.get('title'));
+    //console.log(this.get('title'));
     this.set('author', author);
     this.set('releaseYear', this._randomYear());
     this.set('library', library);

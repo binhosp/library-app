@@ -15,6 +15,11 @@ define('library-app/tests/app.lint-test', [], function () {
     assert.ok(true, 'app.js should pass ESLint\n\n');
   });
 
+  QUnit.test('components/author-select.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'components/author-select.js should pass ESLint\n\n');
+  });
+
   QUnit.test('components/fader-label.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'components/fader-label.js should pass ESLint\n\n');
@@ -28,6 +33,11 @@ define('library-app/tests/app.lint-test', [], function () {
   QUnit.test('components/library-item.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'components/library-item.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('components/library-select.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'components/library-select.js should pass ESLint\n\n');
   });
 
   QUnit.test('components/nav-link-to.js', function (assert) {
@@ -53,6 +63,11 @@ define('library-app/tests/app.lint-test', [], function () {
   QUnit.test('controllers/index.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'controllers/index.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('helpers/is-equal.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'helpers/is-equal.js should pass ESLint\n\n');
   });
 
   QUnit.test('models/author.js', function (assert) {
@@ -406,6 +421,35 @@ define('library-app/tests/helpers/unstub-firebase', ['exports', 'firebase'], fun
     }
   }
 });
+define('library-app/tests/integration/components/author-select-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForComponent)('author-select', 'Integration | Component | author select', {
+    integration: true
+  });
+
+  (0, _emberQunit.test)('it renders', function (assert) {
+    // Set any properties with this.set('myProperty', 'value');
+    // Handle any actions with this.on('myAction', function(val) { ... });
+
+    this.render(Ember.HTMLBars.template({
+      "id": "CmPp+0xt",
+      "block": "{\"symbols\":[],\"statements\":[[1,[18,\"author-select\"],false]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), '');
+
+    // Template block usage:
+    this.render(Ember.HTMLBars.template({
+      "id": "yRMMRzPU",
+      "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[4,\"author-select\",null,null,{\"statements\":[[0,\"      template block text\\n\"]],\"parameters\":[]},null],[0,\"  \"]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
+});
 define('library-app/tests/integration/components/fader-label-test', ['ember-qunit'], function (_emberQunit) {
   'use strict';
 
@@ -487,6 +531,35 @@ define('library-app/tests/integration/components/library-item-test', ['ember-qun
     this.render(Ember.HTMLBars.template({
       "id": "SkOdkOXI",
       "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[4,\"library-item\",null,null,{\"statements\":[[0,\"      template block text\\n\"]],\"parameters\":[]},null],[0,\"  \"]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
+});
+define('library-app/tests/integration/components/library-select-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForComponent)('library-select', 'Integration | Component | library select', {
+    integration: true
+  });
+
+  (0, _emberQunit.test)('it renders', function (assert) {
+    // Set any properties with this.set('myProperty', 'value');
+    // Handle any actions with this.on('myAction', function(val) { ... });
+
+    this.render(Ember.HTMLBars.template({
+      "id": "lw9S1BE5",
+      "block": "{\"symbols\":[],\"statements\":[[1,[18,\"library-select\"],false]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), '');
+
+    // Template block usage:
+    this.render(Ember.HTMLBars.template({
+      "id": "YbesX/iz",
+      "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[4,\"library-select\",null,null,{\"statements\":[[0,\"      template block text\\n\"]],\"parameters\":[]},null],[0,\"  \"]],\"hasEval\":false}",
       "meta": {}
     }));
 
@@ -580,6 +653,26 @@ define('library-app/tests/integration/components/seeder-block-test', ['ember-qun
     assert.equal(this.$().text().trim(), 'template block text');
   });
 });
+define('library-app/tests/integration/helpers/is-equal-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForComponent)('is-equal', 'helper:is-equal', {
+    integration: true
+  });
+
+  // Replace this with your real tests.
+  (0, _emberQunit.test)('it renders', function (assert) {
+    this.set('inputValue', '1234');
+
+    this.render(Ember.HTMLBars.template({
+      "id": "zTQzmbxd",
+      "block": "{\"symbols\":[],\"statements\":[[1,[25,\"is-equal\",[[19,0,[\"inputValue\"]]],null],false]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), '1234');
+  });
+});
 define('library-app/tests/test-helper', ['library-app/tests/helpers/resolver', 'ember-qunit', 'ember-cli-qunit'], function (_resolver, _emberQunit, _emberCliQunit) {
   'use strict';
 
@@ -611,6 +704,11 @@ define('library-app/tests/tests.lint-test', [], function () {
     assert.ok(true, 'helpers/start-app.js should pass ESLint\n\n');
   });
 
+  QUnit.test('integration/components/author-select-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'integration/components/author-select-test.js should pass ESLint\n\n');
+  });
+
   QUnit.test('integration/components/fader-label-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'integration/components/fader-label-test.js should pass ESLint\n\n');
@@ -626,6 +724,11 @@ define('library-app/tests/tests.lint-test', [], function () {
     assert.ok(true, 'integration/components/library-item-test.js should pass ESLint\n\n');
   });
 
+  QUnit.test('integration/components/library-select-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'integration/components/library-select-test.js should pass ESLint\n\n');
+  });
+
   QUnit.test('integration/components/nav-link-to-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'integration/components/nav-link-to-test.js should pass ESLint\n\n');
@@ -639,6 +742,11 @@ define('library-app/tests/tests.lint-test', [], function () {
   QUnit.test('integration/components/seeder-block-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'integration/components/seeder-block-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('integration/helpers/is-equal-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'integration/helpers/is-equal-test.js should pass ESLint\n\n');
   });
 
   QUnit.test('test-helper.js', function (assert) {
